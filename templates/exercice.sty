@@ -1,0 +1,346 @@
+%%% DOCUMENT %%%
+\documentclass[a4paper,11pt]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage[top=2cm,bottom=2cm,left=1.5cm,right=1.5cm]{geometry}
+\usepackage[autolanguage]{numprint}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{cases}
+\usepackage{mathrsfs}
+\usepackage{textcomp}
+\usepackage{stmaryrd}
+\usepackage{inputenc}
+\usepackage{moreverb}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{fancyvrb}
+\usepackage{listings}
+\usepackage{wrapfig}
+\usepackage{subfigure}
+\usepackage{pgfplots}
+\usepackage{esint}
+\usepackage{tikz}
+\usepackage[europeanresistors]{circuitikz}
+\usepackage{multicol}
+\usepackage{tabularx}
+\usepackage{lipsum}
+\usepackage{chngcntr}
+\usepackage{fancyhdr}
+\usepackage{exercise}
+\usepackage{titlesec}
+\usepackage{titletoc}
+\usepackage{vwcol}
+\counterwithin{table}{section}
+\usepackage[titletoc]{appendix}
+\usepackage{pdfpages}
+\usepackage{multirow}
+\usepackage{etoolbox} % for robust commands
+\usepackage{etoolbox} % for robust commands
+% \pgfplotsset{compat=1.16}
+% \usepackage{empheq}
+% \usepackage{tocloft}
+% \usepackage{afterpage}
+% \usepackage{subequations}
+% \usepackage{qrcode}
+
+% -------------------
+% UNITS 
+% -------------------
+\usepackage{siunitx}
+\sisetup{
+    inter-unit-product = \ensuremath{{}\!\cdot\!{}},
+    detect-all,
+    separate-uncertainty = true,
+    exponent-product = \times,
+    space-before-unit = true,
+    output-decimal-marker = {,},
+    multi-part-units = brackets,
+    range-phrase = --,
+    % allow-number-unit-breaks,
+    list-final-separator = { et },
+    list-pair-separator = { et }
+    %,
+    %abbreviations
+}
+\DeclareSIUnit{\dC}{\degres C}				% degré Celsius
+\DeclareSIUnit{\dF}{\degres F}				% degré Farhenheit
+\newcommand{\micro}{$\rm{\mu}$}       % micro droit
+
+% -----------------------------
+% COLORS
+% -----------------------------
+\usepackage{xcolor}
+\definecolor{linkcolor}{rgb}{0,0,0.6}
+\definecolor{cornellred}{rgb}{0.7, 0.11, 0.11}
+\definecolor{darkcyan}{rgb}{0.0, 0.55, 0.55}
+\definecolor{coolblack}{rgb}{0.0, 0.18, 0.39}
+\definecolor{tealblue}{rgb}{0.21, 0.46, 0.53}
+\definecolor{darkgreen}{rgb}{0.0, 0.2, 0.13}
+\definecolor{asparagus}{rgb}{0.53, 0.66, 0.42}
+\definecolor{brickred}{rgb}{0.8, 0.25, 0.33}
+\definecolor{JoliBleu}{rgb}{0,0.55,0.55}
+\definecolor{JoliVert}{rgb}{0.15,0.6,0}
+\definecolor{JoliRouge}{rgb}{0.86,0.08,0}
+\definecolor{JoliJaune}{rgb}{1,0.75,0}
+\definecolor{JoliGris}{rgb}{0.52,0.52,0.51}
+\definecolor{mypink1}{rgb}{1, 0.2, 0.6}
+\colorlet{mdtRed}{red!70!black}
+\definecolor{blueryb}{rgb}{0.01,0.28,1.0}
+\definecolor{bluegray}{rgb}{0.4,0.6 0.8}
+\definecolor{lightgray}{gray}{0.85}
+\definecolor{greenblue}{rgb}{0,0.5,0.3}
+\definecolor{slateblue}{rgb}{0,0.1,0.35}
+\definecolor{lightblue}{rgb}{0.95,0.95,1}
+\definecolor{iconcolor}{rgb}{0.8, 0.25, 0.33}
+
+% -------------------
+% UNITS 
+% -------------------
+\usepackage{siunitx}
+\sisetup{
+    inter-unit-product = \ensuremath{{}\!\cdot\!{}},
+    detect-all,
+    separate-uncertainty = true,
+    exponent-product = \times,
+    space-before-unit = true,
+    output-decimal-marker = {,},
+    multi-part-units = brackets,
+    range-phrase = --,
+    % allow-number-unit-breaks,
+    list-final-separator = { et },
+    list-pair-separator = { et }
+    %,
+    %abbreviations
+}
+
+
+% --------------------
+% COLORS
+% --------------------
+\usepackage{xcolor}
+
+\definecolor{Blue1}{rgb}{0,0.55,0.55}
+\definecolor{Red2}{rgb}{0.86,0.08,0}
+
+% miscellaneous colors
+\definecolor{linkcolor}{rgb}{0,0,0.6}
+\definecolor{cornellred}{rgb}{0.7, 0.11, 0.11}
+\definecolor{darkcyan}{rgb}{0.0, 0.55, 0.55}
+\definecolor{coolblack}{rgb}{0.0, 0.18, 0.39}
+\definecolor{tealblue}{rgb}{0.21, 0.46, 0.53}
+\definecolor{darkgreen}{rgb}{0.0, 0.2, 0.13}
+\definecolor{asparagus}{rgb}{0.53, 0.66, 0.42}
+\definecolor{brickred}{rgb}{0.8, 0.25, 0.33}
+\definecolor{JoliBleu}{rgb}{0,0.55,0.55}
+\definecolor{JoliVert}{rgb}{0.15,0.6,0}
+\definecolor{JoliRouge}{rgb}{0.86,0.08,0}
+\definecolor{JoliJaune}{rgb}{1,0.75,0}
+\definecolor{JoliGris}{rgb}{0.52,0.52,0.51}
+\definecolor{mypink1}{rgb}{1, 0.2, 0.6}
+\colorlet{mdtRed}{red!70!black}
+\definecolor{blueryb}{rgb}{0.01,0.28,1.0}
+\definecolor{bluegray}{rgb}{0.4,0.6 0.8}
+\definecolor{lightgray}{gray}{0.85}
+\definecolor{greenblue}{rgb}{0,0.5,0.3}
+\definecolor{slateblue}{rgb}{0,0.1,0.35}
+\definecolor{lightblue}{rgb}{0.95,0.95,1}
+\definecolor{iconcolor}{rgb}{0.8, 0.25, 0.33}
+
+
+% -----------------------------
+% ENVIRONNEMENT QUESTIONS EXERCICES
+% -----------------------------
+
+% compteur associé aux questions
+\newcounter{question}
+\setcounter{question}{0}
+
+% environnement questions
+\usepackage{enumitem}
+\usepackage{enumitem}
+\newenvironment{questions}[1][\arabic]
+{%
+	\begin{enumerate}[label=#1*)]%
+	\setcounter{enumi}{\value{question}}%
+}{%
+	\end{enumerate}%
+	\setcounter{question}{\value{enumi}}%
+}
+
+
+% -----------------------------
+% PAGE LAYOUT
+% -----------------------------
+
+% titre de l'exercice
+\renewcommand{\ExerciseHeaderTitle}{~\ExerciseTitle}
+\renewcommand{\ExerciseHeaderOrigin}{%
+[\textit{\!\ExerciseOrigin\!}]}
+\renewcommand{\ExerciseName}{\large Exercice}
+\renewcommand{\ExerciseHeader}{\noindent \textcolor{coolblack}{\textbf{\Large
+\ExerciseName \space \ExerciseHeaderNB~:\large\ExerciseHeaderTitle
+\dotfill\ExerciseHeaderOrigin}}\medskip\newline
+}
+
+% bas et en-tête de page
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\lfoot{}
+\rfoot{}
+\lhead{\small Compilé le \today}
+\rhead{\small Source : \texfile}
+\renewcommand{\footrulewidth}{0.5pt}
+\renewcommand{\headrulewidth}{0.5pt}
+
+
+% -----------------------------
+% PAGE LAYOUT
+% -----------------------------
+
+% titre de l'exercice
+\renewcommand{\ExerciseHeaderTitle}{~\ExerciseTitle}
+\renewcommand{\ExerciseHeaderOrigin}{%
+[\textit{\!\ExerciseOrigin\!}]}
+\renewcommand{\ExerciseName}{\large Exercice}
+\renewcommand{\ExerciseHeader}{\noindent \textcolor{coolblack}{\textbf{\Large
+\ExerciseName \space \ExerciseHeaderNB~:\large\ExerciseHeaderTitle
+\dotfill\ExerciseHeaderOrigin}}\medskip\newline
+}
+
+% bas et en-tête de page
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\lfoot{}
+\rfoot{}
+\lhead{\small Compilé le \today}
+\rhead{\small Source : \texfile}
+\renewcommand{\footrulewidth}{0.5pt}
+\renewcommand{\headrulewidth}{0.5pt}
+
+% -----------------------------
+% ENVIRONNEMENT CORRIGÉ
+% -----------------------------
+
+% prédéfinit la commande solution, qui contient le corrigé d’une question
+\newcommand{\solution}[1]{}
+
+% commande pour afficher le corrigé d’un exercice pour chaque question
+\newrobustcmd{\Corrige}{
+\renewcommand{\solution}[1]{
+\begin{soluce}
+{##1}
+\end{soluce}
+}
+}
+
+
+% barre latérale utilisée par l’environnement que contient les solutions 
+\usepackage{mdframed}
+\newmdenv[
+  topline=false,
+  % bottomline=true,
+  bottomline=false,
+  rightline=false,
+  linecolor=JoliRouge,
+  % linewidth=2pt,
+  % skipabove=2\topsep,
+  skipbelow=\topsep,
+  innertopmargin=0.2mm,
+  innertopmargin=0.2mm,
+  innerbottommargin=0.2mm,
+  innerleftmargin=3mm,
+  leftmargin=-15pt,
+  linewidth=1pt,
+  % shadow=true,
+  % shadowsize=2pt,
+  % shadowcolor=gray!50,
+  % rounded corners,
+  % roundcorner=2pt
+]{siderule}
+
+
+% environnement générique avec barre latérale
+\usepackage{changepage}
+% \makeatletter
+% \newenvironment{answer}{%
+% \vspace{0.1cm}%
+% \begin{adjustwidth}{1cm}{}%
+%   \begin{siderule}%
+%   \itshape%
+%  \footnotesize%
+% }{%
+%   \end{siderule}%
+%   \end{adjustwidth}%
+%   \normalsize%
+% }%
+% \makeatother
+
+
+\usepackage{fontawesome} % pour les icones fontwasome
+% icone de l’environnement solution
+\usepackage{fontawesome}
+\newcommand{\iconSoluce}{%
+{\color{iconcolor}\small\faCheckCircle}%
+}
+
+% environnement spécifique pour les corrigés
+\newenvironment{soluce}{%
+
+\noindent\iconSoluce~~\textbf{\textcolor{iconcolor}{Solution}}%
+\vspace{0.1cm}%
+\begin{adjustwidth}{1cm}{}%
+  \begin{siderule}%
+  \itshape%
+ \footnotesize%
+}{%
+\end{siderule}%
+\end{adjustwidth}%
+\normalsize%
+}%
+
+
+%%% EXERCICE %%%
+\renewcommand{\ExerciseHeaderTitle}{~\ExerciseTitle}
+\renewcommand{\ExerciseHeaderOrigin}{%
+[\textit{\!\ExerciseOrigin\!}]}
+\renewcommand{\ExerciseName}{\large Exercice}
+\renewcommand{\ExerciseHeader}{\noindent \textcolor{coolblack}{\textbf{\Large
+\ExerciseName \space \ExerciseHeaderNB~:\large\ExerciseHeaderTitle
+\dotfill\ExerciseHeaderOrigin}}\medskip\newline
+\setcounter{question}{0}}
+
+%%% EXO ENVIRONMENT %%%
+\newcommand{\texfile}{}
+\newrobustcmd{\Source}[1]{
+\renewcommand{\texfile}{#1}
+}
+
+% command to insert an exercise in TD
+\newcommand{\Exercice}[2][0]{
+\ExerciseSelect[exam={#2}]
+\input{\texfile}
+}
+
+% -----------------------------
+% ENVIRONNEMENT EXO
+% -----------------------------
+\NewDocumentEnvironment{exo}{O{PC} O{1} O{colle} m}
+{
+\setcounter{equation}{0}
+\setcounter{question}{0}
+\def\diff{
+$\star$\ifnum#2=1\else
+$\star$\ifnum#2=2\else
+$\star$\ifnum#2=3\fi\fi\fi
+}
+\begin{Exercise}[title={#4}, exam={#4}, origin={\diff~}, label=appli, type={\textsc{#1}}]
+}{
+\end{Exercise}
+}
+% Added by qft-rules.prepaworkshop on start-up
+\graphicspath{{/home/eb/.vscode/qftrules.prepaworkshop/recueil/optique/Figures/}}

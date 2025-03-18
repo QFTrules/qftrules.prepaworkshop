@@ -1,0 +1,153 @@
+{
+	"name": "prepa-workshop",
+	"displayName": "Prépa Workshop",
+	"description": "Espace de travail pour gérer les documents pédagogiques en CPGE scientifique.",
+	"version": "1.0.3",
+	"publisher": "qft-rules",
+	"icon": "images/icon_extension.png",
+	"engines": {
+		"vscode": "^1.85.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/QFTrules/qftrules.prepaworkshop"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onStartupFinished"
+	],
+	"main": "./extension.js",
+	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "package-explorer",
+					"title": "CPGE",
+					"icon": "images/atom2.png"
+				}
+			]
+		},
+		"keybindings": [
+			{
+				"command": "workbench.view.extension.package-explorer",
+				"key": "ctrl+shift+p",
+				"when": "true"
+			},
+			{
+				"command": "banque.compile",
+				"key": "alt+f1",
+				"when": "editorTextFocus && editorLangId == latex"
+			}
+		],
+		"views": {
+			"package-explorer": [
+				{
+					"id": "banque-exercices",
+					"name": "Banque d'exercices",
+					"type": "tree",
+					"icon": "images/default_folder_opened.svg"
+				}
+			]
+		},
+		"commands": [
+			{
+				"command": "banque.fetch",
+				"title": "Ouvrir exercice"
+			},
+			{
+				"command": "banque.copy",
+				"title": "Ajouter exercice",
+				"icon": "$(add)"
+			},
+			{
+				"command": "banque.source",
+				"title": "Ajouter source",
+				"icon": "$(add)"
+			},
+			{
+				"command": "banque.open",
+				"title": "Ouvrir source",
+				"icon": "$(file-code)"
+			},
+			{
+				"command": "banque.compile",
+				"title": "Compiler exercice",
+				"icon": "$(file-pdf)"
+			},
+			{
+				"command": "banque.reveal",
+				"title": "Révéler exercice",
+				"icon": "$(file-pdf)"
+			},
+			{
+				"command": "banque.refresh",
+				"title": "Rafraîchir",
+				"icon": "$(refresh)"
+			}
+		],
+		"menus": {
+			"editor/title": [],
+			"explorer/context": [],
+			"view/item/context": [
+				{
+					"command": "banque.copy",
+					"when": "view == banque-exercices && viewItem == file",
+					"group": "inline"
+				},
+				{
+					"command": "banque.compile",
+					"when": "view == banque-exercices && viewItem == file",
+					"group": "inline@-1"
+				},
+				{
+					"command": "banque.source",
+					"when": "view == banque-exercices && viewItem == chapter",
+					"group": "inline"
+				},
+				{
+					"command": "banque.open",
+					"when": "view == banque-exercices && viewItem == chapter",
+					"group": "inline@-1"
+				}
+			],
+			"view/title": [
+				{
+					"command": "banque.refresh",
+					"when": "view == banque-exercices",
+					"group": "navigation@4"
+				}
+			]
+		},
+		"configuration": {
+			"title": "Prépa Workshop",
+			"properties": {
+				"banque.path": {
+					"type": "string",
+					"default": "/recueil/",
+					"description": "Définit le chemin d'accès vers le dossier qui contient la banque d’exercices. Il s'agit du dossier local /recueil/ de l'extension  par défaut. Il est vivement recommandé de modifier ce chemin d'accès au profit d'un autre dossier personnel de l'utilisateur. Indiquer dans ce cas un chemin absolu."
+				}
+			}
+		}
+	},
+	"scripts": {
+		"lint": "eslint .",
+		"pretest": "npm run lint",
+		"test": "vscode-test"
+	},
+	"devDependencies": {
+		"@types/mocha": "^10.0.6",
+		"@types/node": "18.x",
+		"@types/vscode": "^1.85.0",
+		"@vscode/test-cli": "^0.0.4",
+		"@vscode/test-electron": "^2.3.8",
+		"eslint": "^8.54.0",
+		"typescript": "^5.3.2",
+		"webpack": "^5.98.0",
+		"webpack-cli": "^6.0.1"
+	},
+	"__metadata": {
+		"size": 102344055
+	}
+}

@@ -1,0 +1,17 @@
+.vscode/**
+.vscode-test/**
+test/**
+.gitignore
+.git/**
+.tmp/*.tex
+.tmp/*.pdf
+.tmp/*.log
+.tmp/*.aux
+.tmp/*.out
+.tmp/*.synctex.gz
+.yarnrc
+vsc-extension-quickstart.md
+**/jsconfig.json
+**/*.map
+**/.eslintrc.json
+**/.vscode-test.*
