@@ -127,6 +127,11 @@
 					"type": "string",
 					"default": "/recueil/",
 					"description": "Définit le chemin d'accès vers le dossier qui contient la banque d’exercices. Il s'agit du dossier local /recueil/ de l'extension  par défaut. Il est vivement recommandé de modifier ce chemin d'accès au profit d'un autre dossier personnel de l'utilisateur. Indiquer dans ce cas un chemin absolu."
+				},
+				"banque.exclude": {
+					"type": "string",
+					"default": ["/Figures/"],
+					"description": "Définit les chemins d'accès relatifs vers les sous-dossiers du dossier contenant le recueil d'exercices, et défini par la variable *banque.path*, qui doivent être exclus de l'affichage dans la vue *banque d'exercices*."
 				}
 			}
 		}

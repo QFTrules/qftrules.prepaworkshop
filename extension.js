@@ -1,16 +1,20 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
+// IMPORTS //
 var vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
 const BanqueExoShow = require('./banque');
-// paths
+// ---------------------------------- //
+
+// PATHS //
 const templatePath = __dirname + '/templates'; 
 var BanquePath = vscode.workspace.getConfiguration('banque').get('path');
-// add absolute path of extension if value is defalt /recueil/
+// add absolute path of extension if value is default /recueil/
 if (BanquePath === '/recueil/') {
 	var BanquePath = __dirname + '/recueil/';
 }
+// ---------------------------------- //
+
+// AUXILIARY FUNCTIONS //
 
 // find all subdirectories, WHATEVER THE DEPTH, within directory basePath that are called dirName
 function findDirectories(basePath, dirName) {
@@ -94,20 +98,18 @@ function update_graphics_path() {
 	// }
 }
 
+// ---------------------------------- //
 
 /**
  * @param {vscode.ExtensionContext} context
 */
-function activate() {
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	console.log('The extension "prepa-workshop" is now active!');
-	
-	// get the user setting variables
-	// const BanquePath = vscode.workspace.getConfiguration('banque').get('path');
-	// const BanquePath = path.join(__dirname, '/recueil/');
-	
 
-	// BANQUE EXERCICES commands
+// ACTIVATE FUNCTION //
+
+function activate() {
+	console.log('The extension "prepa-workshop" is now active!');
+
+	// BANQUE EXERCICES COMMANDS //
 	vscode.commands.registerCommand('banque.copy', function (document) {
 		// Copy the document path to the clipboard
 		let editor = vscode.window.activeTextEditor;
@@ -149,23 +151,13 @@ function activate() {
 		}
 	})
 
-	// refresh the tree view of banque exercices
-	// let banque_refresh = vscode.commands.registerCommand('banque.refresh', () => {
-	// 	// const banque_exercices = new BanqueExoShow();
-	// 	const banque_exercices = new BanqueExoShow();
-	// 	vscode.window.registerTreeDataProvider('banque-exercices', banque_exercices);
-	// 	vscode.window.createTreeView('banque-exercices', { treeDataProvider: banque_exercices });
-	// 	// const item = banque_exercices.getTreeItemByLabel(folderName,fileName,exo);
-	// 	// vscode.window.showInformationMessage(item.label);
-	// 	// TreeView.reveal(item, {focus: true, select: true, expand: true});
-	// });
-
 	// copy the latex file and use it as a source in an exercise latex document (TD, ...)
 	vscode.commands.registerCommand('banque.open', function (document) {
 		// open the latex document in vscode
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.file(document.filePath), { viewColumn: vscode.ViewColumn.One });
 	})
 
+	// refresh the tree view of banque exercices
 	vscode.commands.registerCommand('banque.refresh', () => {
 		const banque_exercices = new BanqueExoShow();
 		vscode.window.registerTreeDataProvider('banque-exercices', banque_exercices);
@@ -173,7 +165,6 @@ function activate() {
 
 	// fetch a string in a latex file, like exercise name of balise
 	vscode.commands.registerCommand('banque.fetch', function (doc) {
-		// open document in vscode
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.file(doc.filePath), { viewColumn: vscode.ViewColumn.One });
 
 		// Get the active text editor and string to search
@@ -181,26 +172,26 @@ function activate() {
 		if (!editor) {
 			return;
 		}
+
+		// string to search in the document
 		var searchString = '{' + doc.label + '}';
 		let document = editor.document;
         var text = document.getText();
         var position = text.indexOf(searchString);
 
+		// reveal the string in the editor
         if (position !== -1) {
             var startPosition = document.positionAt(position);
             var endPosition = document.positionAt(position + searchString.length);
             var range = new vscode.Range(startPosition, endPosition);
             editor.selection = new vscode.Selection(range.start, range.end);
 			editor.revealRange(range, vscode.TextEditorRevealType.AtTop);
-        } else {
-            // vscode.window.showInformationMessage('Exercice ou balise non trouvée.');
         }
 	})
 
 	// command to compile an exercise separately
 	vscode.commands.registerCommand('banque.compile', function (document) {
 		
-		// vscode.window.showInformationMessage(document.filePath);
 		// get the active text editor
 		let editor = vscode.window.activeTextEditor;
 		if (!editor) {
@@ -235,17 +226,11 @@ function activate() {
 			var FilePath = editor.document.fileName;
 			// var SourceFile = path.basename(FilePath);
 		} else {
-			vscode.window.showInformationMessage(document.label);
+			// vscode.window.showInformationMessage(document.label);
 			var exo = document.label.replace(/"/g, '');
 			var FilePath = document.filePath;
-			vscode.window.showInformationMessage(FilePath);
+			// vscode.window.showInformationMessage(FilePath);
 			vscode.commands.executeCommand('vscode.open', vscode.Uri.file(FilePath), { 		viewColumn: vscode.ViewColumn.One });
-			// var SourceFile = path.basename(FilePath);
-			// vscode.window.showInformationMessage(exo, document.filePath);
-			// vscode.commands.executeCommand('vscode.open', vscode.Uri.file(document.filePath)).then(() => {
-			// 	// just pass
-			// }
-			// );
 		}
 
 		// name of temporary latex exercise file
@@ -257,7 +242,6 @@ function activate() {
 		const template = `\\input{${templatePath}/exercice.sty}\n\\Corrige\n\\begin{document}\n\\Source{${FilePath}}\n\\Exercice{${exo}}\n\\end{document}`;
 		fs.writeFileSync(exercice + '.tex', template);
 		// open and compile the exercise
-		// vscode.commands.executeCommand('vscode.open', vscode.Uri.file(exercice + `.pdf`), { viewColumn: vscode.ViewColumn.Two });
 		vscode.commands.executeCommand('latex-workshop.build', {rootFile:FilePath, recipe:'pdflatex'}).then(() => {
 			// message to show that the exercise has been compiled
 			vscode.window.showInformationMessage(`Exercice « ${exo} » compilé avec succès.`);

@@ -1,14 +1,12 @@
+// IMPORTS //
 "use strict";
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 var vscode = require('vscode');
-// var child_process = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const TreeItem = require('./treeItem');
-// Object.defineProperty(exports, "__esModule", { value: true });
-// import { DepNodeProvider, Dependency } from './treeview';
+// ---------------------------------- //
 
+// AUXILIARY FUNCTIONS //
 function GetTypeExo(label, filepath) {
 	// filepath is undefined for items in programme de colle
 	if (typeof filepath === 'undefined') {
@@ -35,56 +33,32 @@ function GetTypeExo(label, filepath) {
 		return ['undefined','undefined'];
 	}
 
-// define data for the tree view
 function generateTreeItems() {
 
-	// path to the recueil directory
+	// absolute path to the recueil directory
 	var BanquePath = vscode.workspace.getConfiguration('banque').get('path');
-	// add absolute path of extension if value is defalt /recueil/
 	if (BanquePath === '/recueil/') {
 		var BanquePath = __dirname + '/recueil/';
 	}
-	// vscode.window.showInformationMessage('Path to the recueil directory: ' + BanquePath);
 
-
-	// const texPath = vscode.workspace.getConfiguration('mathpix-pdf').get('texPath');
-	// const path_to_recueil = vscode.workspace.getConfiguration('banque-exercices').get("RecueilPath");
-	// list all folders in the recueil directory
+	// list all folders in the recueil directory and remove the ones excluded
 	var themes_list = fs.readdirSync(BanquePath).filter(file => fs.statSync(path.join(BanquePath, file)).isDirectory());
-	// vscode.window.showInformationMessage('Liste des thèmes : ' + themes_list);
-	// remove folders Figure, _fiches, etc.
-	// themes_list.splice(themes_list.indexOf('Figure'), 1);
-	// // themes_list.splice(themes_list.indexOf('_fiches'), 1);
-	// themes_list.splice(themes_list.indexOf('Oraux'), 1);
-	// themes_list.splice(themes_list.indexOf('.git'), 1);
-	// themes_list.splice(themes_list.indexOf('Info'), 1);
+	const exclude = vscode.workspace.getConfiguration('banque').get('exclude');
+	themes_list = themes_list.filter(theme => !exclude.includes(theme));
 
+	// return the themes in the tree view
 	return themes_list.map(function (theme) {
-		// vscode.window.showInformationMessage(theme);
-
 		// get the list of absolute paths to latex files for the theme 
 		const latex_files = fs.readdirSync(path.join(BanquePath, theme))
 			.filter(file => file.endsWith('.tex'))
 			.map(file => path.join(BanquePath, theme, file));
-		// latex_files.pop();
 
-		// remove the file that stores all exercices where the difficulty is not specified
-		// const suggestion_liste = __dirname + '/tmp/exercices-sans-difficulte.txt';
-		// if (fs.existsSync(suggestion_liste)) {
-		// 	fs.unlinkSync(suggestion_liste);
-		// }
-		// vscode.window.showInformationMessage('Liste des fichiers : ' + latex_files);
-
-		// return a tree item for each theme
+		// return tree items of each theme
 		return new TreeItem(theme.toUpperCase(), // theme level
 			latex_files.map(function (filePath) {
-				// vscode.window.showInformationMessage(filePath);
-				// get chapter latex file basename
-				// var exercices = child_process.execSync('grep -E "\\\\\\\\begin{exo}" ' + filePath).toString().split('\n');
+				// get the list of exercises in the latex file
 				const exercices = fs.readFileSync(filePath, 'utf8').split('\n').filter(line => line.includes('\\begin{exo}'));
-				// exercices.pop();
 				const basename = path.parse(filePath).name
-				// vscode.window.showInformationMessage(basename);
 
 				return new TreeItem(basename, // chapter level
 					exercices.map(function (exo) {
@@ -129,25 +103,16 @@ function generateTreeItems() {
 
 	// return data;
 }
+// ---------------------------------- //
 
 
 
 
 
-
-// define the data providers for the programme de colle panel
+// TREE VIEW CLASS //
 class BanqueExoShow {
     constructor() {
-
-		// Get the active text editor
-		// var editor = vscode.window.activeTextEditor;
-		// if (!editor) {
-		// 	return;
-		// }
-
-		// Generate tree data
 		this.data = generateTreeItems();
-		
     }
 
 	// define here the command to call when clicking on the tree items
@@ -229,6 +194,7 @@ class BanqueExoShow {
 
 };
 
+// EXPORTS //
 module.exports = BanqueExoShow
 module.exports.GetTypeExo = GetTypeExo
-	
+// ---------------------------------- //
