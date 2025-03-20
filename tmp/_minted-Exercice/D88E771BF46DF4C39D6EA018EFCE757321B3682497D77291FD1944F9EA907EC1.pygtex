@@ -1,0 +1,5 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+        \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range} \PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{n}{Nt}\PYG{p}{):} \PYG{c+c1}{\PYGZsh{} l\PYGZsq{}instant initial a déjà été traité}
+          \PYG{n}{T}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{]}  \PYG{o}{=} \PYG{l+m+mi}{0}
+          \PYG{n}{T}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}
+\end{Verbatim}

@@ -22,8 +22,6 @@
 \usepackage{subfigure}
 \usepackage{pgfplots}
 \usepackage{esint}
-\usepackage{tikz}
-\usepackage[europeanresistors]{circuitikz}
 \usepackage{multicol}
 \usepackage{tabularx}
 \usepackage{lipsum}
@@ -38,13 +36,9 @@
 \usepackage{pdfpages}
 \usepackage{multirow}
 \usepackage{etoolbox} % for robust commands
-\usepackage{etoolbox} % for robust commands
-% \pgfplotsset{compat=1.16}
-% \usepackage{empheq}
-% \usepackage{tocloft}
-% \usepackage{afterpage}
-% \usepackage{subequations}
-% \usepackage{qrcode}
+\usepackage{esvect}   % for vector arrows
+\usepackage{minted}   % for python code highlighting
+\setminted[python]{linenos=true,frame=single}
 
 % -------------------
 % UNITS 
@@ -189,9 +183,9 @@
 \pagestyle{fancy}
 \fancyhf{}
 \cfoot{\thepage}
-\lfoot{}
 \rfoot{}
-\lhead{\small Compilé le \today}
+\lfoot{\small Compilé le \today}
+\lhead{}
 \rhead{\small Source : \texfile}
 \renewcommand{\footrulewidth}{0.5pt}
 \renewcommand{\headrulewidth}{0.5pt}
@@ -329,16 +323,16 @@
 % -----------------------------
 % ENVIRONNEMENT EXO
 % -----------------------------
-\NewDocumentEnvironment{exo}{O{PC} O{1} O{colle} m}
+\NewDocumentEnvironment{exo}{O{1} O{colle} O{PC} m}
 {
 \setcounter{equation}{0}
 \setcounter{question}{0}
 \def\diff{
-$\star$\ifnum#2=1\else
-$\star$\ifnum#2=2\else
-$\star$\ifnum#2=3\fi\fi\fi
+$\star$\ifnum#1=1\else
+$\star$\ifnum#1=2\else
+$\star$\ifnum#1=3\fi\fi\fi
 }
-\begin{Exercise}[title={#4}, exam={#4}, origin={\diff~}, label=appli, type={\textsc{#1}}]
+\begin{Exercise}[title={#4}, exam={#4}, origin={\diff~}, label=appli, type={\textsc{#3}}]
 }{
 \end{Exercise}
 }

@@ -1,36 +1,6 @@
 % !TEX root = /home/eb/.vscode/qftrules.prepaworkshop/tmp/Exercice.tex
-\begin{exo}[PC][1][TD]{Indice optique du méthane}
-  On considère l'interféromètre ci-contre, composé de deux miroirs et de deux lames semi-réfléchissantes qui transmettent la moitié de l'intensité lumineuse et réfléchissent l'autre moitié. L'interféromètre est éclairé par un laser de longueur d'onde $\lambda=\SI{532}{nm}$ et une photodiode mesure l'intensité dans l'une des voies de sortie de l'interféromètre. Une cuve fermée de longueur $\ell=\SI{10}{cm}$ est placée sur une voie. Cette cuve contient initialement de l'air, d'indice optique $n_{\rm{air}}$, que l'on remplace progressivement par du méthane d'indice $n_{\rm{CH}_4}>n_{\rm{air}}$. Au cours de la procédure, la photodiode détecte le défilement de 32 franges.
-  
-  \begin{center}
-  \includegraphics[width=0.5\textwidth]{mach_zehnder.png}
-  \end{center}
-  
-  \begin{questions}
-  \item Exprimer l'ordre d'interférences $p_{\rm{air}}$ lorsque la cuve est remplie d'air, en fonction des longueurs géométriques $L_1$ et $L_2$ des bras de l'interféromètre.
-  \solution{
-  La différence de marche vaut $\delta = (SM)_2 - (SM)_1  = n_{\rm air} (L_2-L_1)$. L’ordre d’interférences vaut
-$$  \boxed{p_{\rm air} = \frac{\delta}{\lambda} = \frac{n_{\rm air} (L_2-L_1)}{\lambda}.}$$
-  }
-  \item Exprimer de même l'ordre $p_{\rm{CH}_4}$ lorsque la cuve est remplie de méthane.
-  \solution{
-  Le chemin optique $(SM)_2$ a maintenant augmenté de $(n_{ch4} - n_{\rm air})\ell.$  donc
-$$  \boxed{p_{\rm ch4}  = p_{\rm air}  + (n_{ch4} - n_{\rm air})\frac{\ell}{\lambda}.}$$
-  }
-  \item En déduire l'indice optique du méthane sachant que $n_{\rm{air}}-1=\num{2,78e-4}$.
-  \solution{
-  On a un nombre de franges qui défilent $N = 32 = p_{\rm ch4} -p_{\rm air} = (n_{ch4} - n_{\rm air})\frac{\ell}{\lambda}$. Donc
-$$  \boxed{
-	n_{ch 4} -1 =  n_{\rm air} - 1 + \frac{N \lambda}{\ell} = \SI{4.48e-4}{}.
-  }$$
-  }
-  \end{questions}
-  \end{exo}
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{exo}[PC][1][devoir]{Interféromètre de Fabry-Perot}
+\begin{exo}[1][TD]{Interféromètre de Fabry-Perot}
   Un interféromètre de Fabry-Perot est constitué d'une lame d'air à faces parallèles d'épaisseur $e$ comprise entre deux lames de verre d'épaisseur négligeable. Ces lames ont un coefficient de transmission en amplitude $t$ et un coefficient de réflexion en amplitude $r$.
   On éclaire la lame avec une source étendue monochromatique de longueur d'onde $\lambda=\SI{422,7}{nm}$. Un rayon incident donne naissance à différents rayons dont on doit tenir compte si le coefficient de réflexion est élevé.
   \begin{center}

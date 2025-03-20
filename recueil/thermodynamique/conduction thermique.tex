@@ -1,0 +1,172 @@
+% !TEX root = /home/eb/.vscode/qftrules.prepaworkshop/tmp/Exercice.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{exo}[1][python]{Méthode d'Euler et équation de diffusion}
+
+  \paragraph{Introduction}
+    On s'intéresse ici à une barre métallique cylindrique dont la surface latérale est calorifugée. Les deux extrémités gauche et droite de la barre sont en contact avec de la glace fondante de température $T_g = \SI{0}{\degree C}$, qui joue le rôle de thermostat.  L’objectif de cet exercice est de résoudre numériquement l’équation de la diffusion thermique dans cette situation simple. On appelle désormais $L=\SI{1}{m}$ la longueur de la barre. On rappelle que l'équation de diffusion thermique s'écrit
+    $$
+    \boxed{
+    \frac{\partial T}{\partial t} = \kappa \frac{\partial^2 T}{\partial x^2},
+    }
+    $$
+    où $\kappa$ désigne la diffusivité thermique. On considérera un matériau de diffusivité $\kappa=\SI{e-4}{m^2.s^{-1}}$.
+    
+    
+    Nous allons dans la suite déterminer la température $T(x,t)$, en tout point $x$ de la barre,
+     et à tout instant $t$ de l'expérience. Pour cela, nous allons découper la barre en tronçons de longueur $\mathrm{d} x=\SI{1}{cm}$.
+    L'étude sera menée sur une durée de $\Delta t = \SI{30}{min}$, avec un pas temporel de $\mathrm{d} t=\SI{0,4}{s}$. La fonction $T(x,t)$ sera donc approximée par un tableau \texttt{T[i,j]} de telle sorte que :
+    $$
+    \boxed{
+      \texttt{T[i,j]} = T(x=j dx,t=i dt).
+    }$$
+    
+    Autrement dit, chaque ligne \texttt{i} du tableau correspond à l'instant $t=i\mathrm{d}t$ de l'expérience (la ligne \texttt{i=0} correspondant à l'instant initial), et chaque colonne \texttt{j} du tableau représente la position $x=j\mathrm{d}x$ (la colonne \texttt{j=0} correspondant au bord gauche).
+    
+    Le tableau utilisé est de type \texttt{numpy.array}. On aura de plus besoin du module \texttt{matplotlib.pyplot} pour effectuer les représentations graphiques du champ de température. On importe pour cela les modules suivants. 
+\begin{minted}{python}
+import numpy as np
+import matplotlib.pyplot as plt
+\end{minted}
+    
+    \paragraph{Initialisation}
+    \begin{questions}
+      \item	
+    
+      On nommera désormais les variables entières \texttt{Nt} et \texttt{Nx} correspondant respectivement au nombre de lignes  et de colonnes du tableau \texttt{T}.
+      
+      Compléter les lignes suivantes pour définir \texttt{Nx} et \texttt{Nt} sur Python, et créer le tableau \texttt{T} en le remplissant de zéros pour l'instant. Créer également les tableaux \texttt{x} et \texttt{t} correspondant respectivement aux positions $x$ et aux instants $t$ pour lesquels la température est évaluée.
+\begin{minted}{python}
+dx = 1e-2
+dt = 4e-1
+L  = 1
+Deltat = 30*60
+\end{minted}
+    % \solution{
+\begin{minted}{python}
+Nx = int(L/dx) + 1
+Nt = int(Deltat/dt) + 1
+
+T = np.zeros((Nt,Nx))
+
+x = np.array([j*dx for j in range(Nx)])
+t = np.array([i*dt for i in range(Nt)])
+\end{minted}
+    % }
+    \item On suppose que le profil de température initial a pour expression 
+    $$
+    T(x,t=0) = T_0 \sin (2\pi x/L),
+    $$
+    avec $T_0 = \SI{20}{\degree C}$. Remplir la première ligne du tableau \texttt{T} pour spécifier les conditions initiales de l'expérience.
+% \solution{
+\begin{minted}{python}
+T0 = 20
+T[0,:] = T0*np.sin(2*np.pi*x/L)
+\end{minted}
+    % }
+    \item Compléter le code suivant pour tracer l'évolution de la température initiale au sein de la barre.
+\begin{minted}{python}
+plt.close()
+plt.figure()
+plt.grid()
+plt.xlabel("x (m)")
+plt.ylabel("T (°C)")
+plt.title("Profil de température initial")
+\end{minted}
+    % \solution{
+\begin{minted}{python}
+plt.plot(x,T[0,:])
+plt.show()
+\end{minted}
+    % }
+    \end{questions}
+    
+    
+    \begin{questions}
+      \item	
+      Remplir le tableau \texttt{T} de manière à imposer, à tout instant, les conditions aux limites aux deux extrémités de la barre, $T(x=0,t)=0$ et $T(x=L,t)=0$.
+      % \solution{
+        \begin{minted}{python}
+        for i in range (1,Nt): # l'instant initial a déjà été traité
+          T[i,0]  = 0
+          T[i,-1] = 0
+        \end{minted}
+        % }
+      \end{questions}
+      
+      \paragraph{Discrétisation de l'équation de diffusion}
+      Il s'agit donc désormais de résoudre l'équation :
+      $$\frac{\partial T}{\partial t} = \kappa \frac{\partial^2 T}{\partial x^2}.$$
+      \begin{questions}
+        \item En utilisant l'approximation de la dérivée, exprimer $\frac{\partial T}{\partial t}(t=i\mathrm{d}t,x=j\mathrm{d}x)$ en fonction des éléments de matrice \texttt{T[i,j]} et \texttt{T[i+1,j]}.
+        \solution{
+          $$
+          \boxed{\dfrac{\partial T}{\partial t}(t=i\mathrm{d}t,x=j\mathrm{d}x) \simeq \frac{\texttt{T[i+1,j]}-\texttt{T[i,j]}}{\mathrm{d}t}}
+          $$
+        }
+        \item Soit une fonction $f$. En écrivant la formule de Taylor à l’ordre 2 pour $f(x+\mathrm{d} x)$ et $f(x-\mathrm{d} x)$, démontrer que : 
+        $$ f''(x)\simeq\frac{f(x+\mathrm{d} x)+f(x-\mathrm{d} x)-2f(x)}{\mathrm{d} x^2}.$$
+        \solution{
+Les développements de Taylor à l'ordre 2 de $f(x+\mathrm{d} x)$ et $f(x-\mathrm{d} x)$ sont respectivement : 
+$$
+f(x+\mathrm{d} x)\simeq f(x)+f'(x)\mathrm{d} x+\frac{f''(x)}{2}\mathrm{d} x^2
+$$
+et
+$$
+f(x-\mathrm{d} x)\simeq f(x)-f'(x)\mathrm{d} x+\frac{f''(x)}{2}\mathrm{d} x^2.
+$$
+En sommant ces deux expressions, on obtient :
+$$
+f(x+\mathrm{d} x)+f(x-\mathrm{d} x)\simeq 2f(x)+f''(x)\mathrm{d} x^2.
+$$
+En isolant $f''(x)$, on obtient bien la relation souhaitée.
+        }
+        \item En déduire l'approximation de la grandeur $\frac{\partial^2 T}{\partial x^2}(t=i\mathrm{d}t,x=j\mathrm{d}x)$ en fonction des éléments de matrice \texttt{T[i,j]}, \texttt{T[i,j+1]} et  \texttt{T[i,j-1]}.
+        \solution{
+          $$
+          \boxed{\dfrac{\partial^2 T}{\partial x^2}(t=i\mathrm{d}t,x=j\mathrm{d}x) \simeq \frac{\texttt{T[i,j+1]}+\texttt{T[i,j-1]}-2\texttt{T[i,j]}}{\mathrm{d}x^2}.}
+          $$
+        }
+        \item En déduire que la résolution de l'équation de diffusion thermique dans la barre se ramène au schéma numérique :
+        \begin{center}
+          $$ \boxed{
+            \texttt{T[i+1,j]}=\texttt{T[i,j]}+\frac{\kappa \mathrm{d}t}{\mathrm{d}x^2} \left( \texttt{T[i,j+1]}+\texttt{T[i,j-1]}-2\texttt{T[i,j]}\right).
+            }$$
+        \end{center}
+      \end{questions}
+    
+      \paragraph{Résolution}
+      On peut montrer qu'un tel schéma numérique converge si $$\frac{\kappa \mathrm{d} t}{\mathrm{d} x^2}<\frac{1}{2}.$$ Avec les valeurs de $\mathrm{d} x$ et de $\mathrm{d} t$ choisies, cette condition est respectée pour la valeur choisie de la diffusivité thermique $\kappa=\SI{e-4}{m^2.s^{-1}}$.
+      \begin{questions}
+        \item	Implémenter ce schéma numérique en réalisant une boucle sur \texttt{i} et éventuellement sur \texttt{j} pour remplir le tableau \texttt{T} dans son intégralité.
+        % \solution{
+\begin{minted}{python}
+kappa = 1e-4
+for i in range(0,Nt-1): # on remplit à l'indice i+1
+  for j in range(1,Nx-1): # les conditions aux limites sont déjà fixées
+  T[i+1,j]=T[i,j]+kappa*dt/(dx**2)*(T[i,j+1]+T[i,j-1]-2*T[i,j])
+\end{minted}
+        % }
+        \item On souhaite tracer le profil de température aux différents instants définis dans la liste ci-dessous. Compléter le code ci-dessous de sorte à tracer sur un même graphique légendé l'évolution du profil de température dans le temps.
+    %     \begin{minted}{python}
+    %     plt.close()
+    %     plt.figure()
+    %     plt.grid()
+    %     plt.xlabel("x (m)")
+    %     plt.ylabel("T (°C)")
+    %     plt.title("Profil de température dans la barre à différents instants")
+    
+    %     instants = [0,1,3,6,9,12,15,30] # instants choisis en minutes
+    % \end{minted}
+    % % \solution{
+    %   \begin{minted}{python}
+    %   for t in instants: # tracé du profil du température aux instants choisis
+    %     i = int(t*60/dt)
+    %     plt.plot(x,T[i,:],label="t = "+str(t)+" min")
+        
+    % plt.legend()
+    % plt.show()
+    % \end{minted}
+    % }
+      \end{questions}
+    \end{exo}
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
