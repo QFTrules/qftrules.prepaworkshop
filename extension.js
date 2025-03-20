@@ -39,11 +39,11 @@ function findDirectories(basePath, dirName) {
 }
 
 // insert the TEX root line at the beginning of the file
-function insertLatexMagic(editor, exercice) {
+function insertLatexMagic(editor, rootFile) {
 	// get text of the active editor
 	const editorText = editor.document.getText();
 	// define latex magic line
-	const latex_magic = `% !TEX root = ${exercice}.tex`;
+	const latex_magic = `% !TEX root = ${rootFile}.tex`;
 	// add this line if not present at the beginning of the file
 	if (editorText.includes(`% !TEX root `)) {
 		editor.edit(editBuilder => {
@@ -241,7 +241,7 @@ function activate() {
 		// create the exercise latex file
 		const template = `\\input{${templatePath}/exercice.sty}\n\\Corrige\n\\begin{document}\n\\Source{${FilePath}}\n\\Exercice{${exo}}\n\\end{document}`;
 		fs.writeFileSync(exercice + '.tex', template);
-		// open and compile the exercise
+		// compile and open the exercise
 		vscode.commands.executeCommand('latex-workshop.build', {rootFile:FilePath, recipe:'pdflatex'}).then(() => {
 			// message to show that the exercise has been compiled
 			vscode.window.showInformationMessage(`Exercice « ${exo} » compilé avec succès.`);
