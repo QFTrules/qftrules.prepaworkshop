@@ -1,0 +1,9 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+    \PYG{n}{Nx} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{L}\PYG{o}{/}\PYG{n}{dx}\PYG{p}{)} \PYG{o}{+} \PYG{l+m+mi}{1}
+    \PYG{n}{Nt} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{Deltat}\PYG{o}{/}\PYG{n}{dt}\PYG{p}{)} \PYG{o}{+} \PYG{l+m+mi}{1}
+
+    \PYG{n}{T} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{((}\PYG{n}{Nt}\PYG{p}{,}\PYG{n}{Nx}\PYG{p}{))}
+
+    \PYG{n}{x} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{([}\PYG{n}{j}\PYG{o}{*}\PYG{n}{dx} \PYG{k}{for} \PYG{n}{j} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{Nx}\PYG{p}{)])}
+    \PYG{n}{t} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{([}\PYG{n}{i}\PYG{o}{*}\PYG{n}{dt} \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{Nt}\PYG{p}{)])}
+\end{Verbatim}
