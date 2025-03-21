@@ -13,13 +13,19 @@
 		"url": "https://github.com/QFTrules/qftrules.prepaworkshop"
 	},
 	"categories": [
-		"Other"
+		"Snippets"
 	],
 	"activationEvents": [
 		"onStartupFinished"
 	],
 	"main": "./extension.js",
 	"contributes": {
+		"snippets": [
+			{
+				"language": "javascript",
+				"path": "./.vscode/snippets.json"
+			}
+			],
 		"viewsContainers": {
 			"activitybar": [
 				{
