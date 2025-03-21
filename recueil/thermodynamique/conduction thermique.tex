@@ -41,7 +41,7 @@ dt = 4e-1
 L  = 1
 Deltat = 30*60
 \end{minted}
-    % \solution{
+    \solution*{
 \begin{minted}{python}
 Nx = int(L/dx) + 1
 Nt = int(Deltat/dt) + 1
@@ -51,18 +51,18 @@ T = np.zeros((Nt,Nx))
 x = np.array([j*dx for j in range(Nx)])
 t = np.array([i*dt for i in range(Nt)])
 \end{minted}
-    % }
+    }
     \item On suppose que le profil de température initial a pour expression 
     $$
     T(x,t=0) = T_0 \sin (2\pi x/L),
     $$
     avec $T_0 = \SI{20}{\degree C}$. Remplir la première ligne du tableau \texttt{T} pour spécifier les conditions initiales de l'expérience.
-% \solution{
-\begin{minted}{python}
-T0 = 20
-T[0,:] = T0*np.sin(2*np.pi*x/L)
-\end{minted}
-    % }
+\solution{
+% \begin{minted}{python}
+% T0 = 20
+% T[0,:] = T0*np.sin(2*np.pi*x/L)
+% \end{minted}
+    }
     \item Compléter le code suivant pour tracer l'évolution de la température initiale au sein de la barre.
 \begin{minted}{python}
 plt.close()

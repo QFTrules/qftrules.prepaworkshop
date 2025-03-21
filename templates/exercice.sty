@@ -4,6 +4,8 @@
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
 \usepackage[top=2cm,bottom=2cm,left=1.5cm,right=1.5cm]{geometry}
+\setlength{\headheight}{14pt} % pour éviter un warning
+\setlength\parskip{\baselineskip} % pour éviter un warning
 \usepackage[autolanguage]{numprint}
 \usepackage{lmodern}
 \usepackage{amsmath}
@@ -39,56 +41,7 @@
 \usepackage{esvect}   % for vector arrows
 \usepackage{minted}   % for python code highlighting
 \setminted[python]{linenos=true,frame=single}
-
-% -------------------
-% UNITS 
-% -------------------
-\usepackage{siunitx}
-\sisetup{
-    inter-unit-product = \ensuremath{{}\!\cdot\!{}},
-    detect-all,
-    separate-uncertainty = true,
-    exponent-product = \times,
-    space-before-unit = true,
-    output-decimal-marker = {,},
-    multi-part-units = brackets,
-    range-phrase = --,
-    % allow-number-unit-breaks,
-    list-final-separator = { et },
-    list-pair-separator = { et }
-    %,
-    %abbreviations
-}
-\DeclareSIUnit{\dC}{\degres C}				% degré Celsius
-\DeclareSIUnit{\dF}{\degres F}				% degré Farhenheit
-\newcommand{\micro}{$\rm{\mu}$}       % micro droit
-
-% -----------------------------
-% COLORS
-% -----------------------------
-\usepackage{xcolor}
-\definecolor{linkcolor}{rgb}{0,0,0.6}
-\definecolor{cornellred}{rgb}{0.7, 0.11, 0.11}
-\definecolor{darkcyan}{rgb}{0.0, 0.55, 0.55}
-\definecolor{coolblack}{rgb}{0.0, 0.18, 0.39}
-\definecolor{tealblue}{rgb}{0.21, 0.46, 0.53}
-\definecolor{darkgreen}{rgb}{0.0, 0.2, 0.13}
-\definecolor{asparagus}{rgb}{0.53, 0.66, 0.42}
-\definecolor{brickred}{rgb}{0.8, 0.25, 0.33}
-\definecolor{JoliBleu}{rgb}{0,0.55,0.55}
-\definecolor{JoliVert}{rgb}{0.15,0.6,0}
-\definecolor{JoliRouge}{rgb}{0.86,0.08,0}
-\definecolor{JoliJaune}{rgb}{1,0.75,0}
-\definecolor{JoliGris}{rgb}{0.52,0.52,0.51}
-\definecolor{mypink1}{rgb}{1, 0.2, 0.6}
-\colorlet{mdtRed}{red!70!black}
-\definecolor{blueryb}{rgb}{0.01,0.28,1.0}
-\definecolor{bluegray}{rgb}{0.4,0.6 0.8}
-\definecolor{lightgray}{gray}{0.85}
-\definecolor{greenblue}{rgb}{0,0.5,0.3}
-\definecolor{slateblue}{rgb}{0,0.1,0.35}
-\definecolor{lightblue}{rgb}{0.95,0.95,1}
-\definecolor{iconcolor}{rgb}{0.8, 0.25, 0.33}
+\pgfplotsset{compat=1.16} % for pgfplots compatibility
 
 % -------------------
 % UNITS 
@@ -190,46 +143,49 @@
 \renewcommand{\footrulewidth}{0.5pt}
 \renewcommand{\headrulewidth}{0.5pt}
 
-
-% -----------------------------
-% PAGE LAYOUT
-% -----------------------------
-
-% titre de l'exercice
-\renewcommand{\ExerciseHeaderTitle}{~\ExerciseTitle}
-\renewcommand{\ExerciseHeaderOrigin}{%
-[\textit{\!\ExerciseOrigin\!}]}
-\renewcommand{\ExerciseName}{\large Exercice}
-\renewcommand{\ExerciseHeader}{\noindent \textcolor{coolblack}{\textbf{\Large
-\ExerciseName \space \ExerciseHeaderNB~:\large\ExerciseHeaderTitle
-\dotfill\ExerciseHeaderOrigin}}\medskip\newline
-}
-
-% bas et en-tête de page
-\pagestyle{fancy}
-\fancyhf{}
-\cfoot{\thepage}
-\lfoot{}
-\rfoot{}
-\lhead{\small Compilé le \today}
-\rhead{\small Source : \texfile}
-\renewcommand{\footrulewidth}{0.5pt}
-\renewcommand{\headrulewidth}{0.5pt}
-
 % -----------------------------
 % ENVIRONNEMENT CORRIGÉ
 % -----------------------------
 
 % prédéfinit la commande solution, qui contient le corrigé d’une question
+\usepackage{xparse}
+% \makeatletter
+% \newcommand{\solution}{%
+% \@ifstar
+%   \solutionStar%
+%   \solutionNoStar%
+% }
+% \makeatother
+% \newcommand{\solutionStar}[1]{}
+% \newcommand{\solutionNoStar}[1]{}
 \newcommand{\solution}[1]{}
+
 
 % commande pour afficher le corrigé d’un exercice pour chaque question
 \newrobustcmd{\Corrige}{
-\renewcommand{\solution}[1]{
-\begin{soluce}
-{##1}
-\end{soluce}
-}
+  % redefine the solution command
+  \renewcommand{\solution}[1]{
+    % \IfBooleanTF{##1}{
+    %   \begin{soluce*}
+    %     {##2}
+    %   \end{soluce*}
+    % }{
+      \begin{soluce}
+        {##1}
+      \end{soluce}
+    % }
+  }
+  % \renewcommand{\solution}[1]{
+  %   \begin{soluce}
+  %     {##1}
+  %   \end{soluce}
+  % }
+  % % redefine the solution environment
+  % \WithSuffix\renewcommand\solution*[1]{
+  %   \begin{soluce*}
+  %     {##1}
+  %   \end{soluce*}
+  % }
 }
 
 
@@ -277,25 +233,45 @@
 
 \usepackage{fontawesome} % pour les icones fontwasome
 % icone de l’environnement solution
-\usepackage{fontawesome}
 \newcommand{\iconSoluce}{%
 {\color{iconcolor}\small\faCheckCircle}%
 }
 
 % environnement spécifique pour les corrigés
 \newenvironment{soluce}{%
-
 \noindent\iconSoluce~~\textbf{\textcolor{iconcolor}{Solution}}%
-\vspace{0.1cm}%
-\begin{adjustwidth}{1cm}{}%
+\vspace{0.25cm}%
+% \IFBooleanTF{#1}{%
+  \begin{adjustwidth}{1cm}{}%
   \begin{siderule}%
   \itshape%
- \footnotesize%
+  % }{%
+  % }%
+  \footnotesize%
 }{%
-\end{siderule}%
-\end{adjustwidth}%
-\normalsize%
+% \IFBooleanTF{#1}{%
+  \end{siderule}%
+  \end{adjustwidth}%
+  % }{%
+  % }%
+  \normalsize%
 }%
+
+% % define soluce* environment for minted code
+% \newenvironment{soluce*}{}
+% {%
+% % \noindent\iconSoluce~~\textbf{\textcolor{iconcolor}{Solution}}%
+% % \vspace{0.25cm}%
+% % \begin{adjustwidth}{1cm}{}%
+%   % \begin{siderule}%
+%   % \itshape%
+%   % \footnotesize%
+% }{%
+%   % \end{siderule}%
+% % \end{adjustwidth}%
+% % \normalsize%
+% }%
+
 
 
 %%% EXERCICE %%%

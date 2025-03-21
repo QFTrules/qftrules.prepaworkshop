@@ -22,8 +22,8 @@
 	"contributes": {
 		"snippets": [
 			{
-				"language": "javascript",
-				"path": "./.vscode/snippets.json"
+				"language": "latex",
+				"path": "./snippets.json"
 			}
 			],
 		"viewsContainers": {
