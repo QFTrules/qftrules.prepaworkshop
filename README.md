@@ -1,51 +1,28 @@
-# Programme de colle README
+# Visual Studio Code Prépa Workshop Extension
 
-Ceci est le README pour l'extension "Programme de colle".
+[![version](https://img.shields.io/visual-studio-marketplace/v/qft-rules.prepa-workshop)](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop)
+[![updated](https://img.shields.io/visual-studio-marketplace/last-updated/qft-rules.prepa-workshop)](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop)
+[![release](https://img.shields.io/visual-studio-marketplace/release-date/qft-rules.prepa-workshop)](https://vsmarketplacebadge.apphb.com/downloads-short/qft-rules.prepa-workshop.svg)
 
-## Caractéristiques
+[![downloads](https://img.shields.io/visual-studio-marketplace/d/qft-rules.prepa-workshop)](https://vsmarketplacebadge.apphb.com/downloads-short/qft-rules.prepa-workshop.svg)
+[![installs](https://img.shields.io/visual-studio-marketplace/i/qft-rules.prepa-workshop)](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop)
+[![rating](https://img.shields.io/visual-studio-marketplace/r/qft-rules.prepa-workshop)](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop)
+[![license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://raw.githubusercontent.com/James-Yu/LaTeX-Workshop/master/LICENSE.txt)
 
-Cette extension affiche le programme de colle en cours. Plus précisément, elle récupère toutes les commandes "\Programmecolle" dans les fichiers latex des dossiers Cours, TD, DM, DS et TP, et les stocke dans des fichiers temporaires fist_.txt.
+[![TeX Live on Windows](https://github.com/James-Yu/LaTeX-Workshop/workflows/TeX%20Live%20on%20Windows/badge.svg)](https://github.com/James-Yu/LaTeX-Workshop/actions?query=workflow%3A%22TeX+Live+on+Windows%22)
+[![TeX Live on macOS](https://github.com/James-Yu/LaTeX-Workshop/workflows/TeX%20Live%20on%20macOS/badge.svg)](https://github.com/James-Yu/LaTeX-Workshop/actions?query=workflow%3A%22TeX+Live+on+macOS%22)
+[![TeX Live on Linux](https://github.com/James-Yu/LaTeX-Workshop/workflows/TeX%20Live%20on%20Linux/badge.svg)](https://github.com/James-Yu/LaTeX-Workshop/actions?query=workflow%3A%22TeX+Live+on+Linux%22)
 
-## Exigences
+Prépa Workshop est une extension de [Visual Studio Code](https://code.visualstudio.com/), dont le but est de fournir un espace de travail aux enseignants en CPGE scientifique qui utilisent Latex sur [Visual Studio Code](https://code.visualstudio.com/).
 
-Il n'y a pas de dépendance.
 
-## Paramètres de l'extension
+### Dépendances
+![](https://img.shields.io/badge/warning-important-red.svg)
 
-Il n'y a pas de réglages.
+Cette extension nécessite l'extension [Latex Workshop](https://marketplace.visualstudio.com/items?itemName=James-Yu.latex-workshop) de [Visual Studio Code](https://code.visualstudio.com/), ainsi qu'une distribution [TexLive](https://www.tug.org/texlive/) locale.
 
-<!-- Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+### Table of Contents
 
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something. -->
-
-## Problèmes connus
-
-La boîte d'information vscode ne prend pas en charge les sauts de ligne !
-
-## Notes de mise à jour
-
-<!-- Les utilisateurs apprécient les notes de version lorsque vous mettez à jour votre extension. -->
-
-### 1.0.0
-
-Première création.
-
-<!-- ## Working with Markdown
-
-You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!** -->
+- [Accueil](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Accueil)
+- [Vues arborescentes](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Vues-arborescentes)
+  - [Banque d'exercices](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/banque-d'exercices)
