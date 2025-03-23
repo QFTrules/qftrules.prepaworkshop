@@ -165,30 +165,39 @@ function activate() {
 
 	// fetch a string in a latex file, like exercise name of balise
 	vscode.commands.registerCommand('banque.fetch', function (doc) {
-		vscode.commands.executeCommand('vscode.open', vscode.Uri.file(doc.filePath), { viewColumn: vscode.ViewColumn.One });
+		vscode.commands.executeCommand('vscode.open', vscode.Uri.file(doc.filePath), { viewColumn: vscode.ViewColumn.One }).then(() => {
+			// Get the active text editor and string to search
+			var editor = vscode.window.activeTextEditor;
+			if (!editor) {
+				return;
+			}
 
-		// Get the active text editor and string to search
-		var editor = vscode.window.activeTextEditor;
-		if (!editor) {
-			return;
-		}
-
-		// string to search in the document
-		var searchString = '{' + doc.label + '}';
-		let document = editor.document;
-        var text = document.getText();
-        var position = text.indexOf(searchString);
-
-		// reveal the string in the editor
-        if (position !== -1) {
-            var startPosition = document.positionAt(position);
-            var endPosition = document.positionAt(position + searchString.length);
-            var range = new vscode.Range(startPosition, endPosition);
-            editor.selection = new vscode.Selection(range.start, range.end);
+			// first occurrence of string to search in the document
+			var searchString = '{' + doc.label + '}';
+			let document = editor.document;
+			var text = document.getText();
+			var position = text.indexOf(searchString);
+			var startPosition = document.positionAt(position);
+			var endPosition = document.positionAt(position + searchString.length);
+			
+			// check that the string \begin{exo} is also at the beginning of the line
+			var line = document.lineAt(startPosition.line).text;
+			while (!line.includes('{exo}')) {
+					// look for next occurrence of searchString
+					position = text.indexOf(searchString, position + 1);
+					startPosition = document.positionAt(position);
+					endPosition = document.positionAt(position + searchString.length);
+					range = new vscode.Range(startPosition, endPosition);
+					line = document.lineAt(startPosition.line).text;
+				}
+				
+			// select the range and reveal it in the editor
+			var range = new vscode.Range(startPosition, endPosition);
+			editor.selection = new vscode.Selection(range.start, range.end);
 			editor.revealRange(range, vscode.TextEditorRevealType.AtTop);
-        }
+		});
 	})
-
+			
 	// command to compile an exercise separately
 	vscode.commands.registerCommand('banque.compile', function (document) {
 		

@@ -24,8 +24,8 @@ function GetTypeExo(label, filepath) {
 			var endIndex = line.lastIndexOf(']');
 			const typeExo = line.substring(startIndex, endIndex);
 			// get the difficulty of the exercise (on, two, three stars)
-			var startIndex = line.indexOf('[', line.indexOf('[') + 1) + 1;
-			var endIndex = line.indexOf(']', line.indexOf(']') + 1);
+			var startIndex = line.indexOf('[') + 1;
+			var endIndex = line.indexOf(']');
 			const difficulty = line.substring(startIndex, endIndex);
 			return [typeExo, difficulty];
 			}
