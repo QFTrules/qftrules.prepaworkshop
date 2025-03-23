@@ -6,34 +6,7 @@ const path = require('path');
 const TreeItem = require('./treeItem');
 // ---------------------------------- //
 
-// AUXILIARY FUNCTIONS //
-function GetTypeExo(label, filepath) {
-	// filepath is undefined for items in programme de colle
-	if (typeof filepath === 'undefined') {
-		return ['undefined','undefined'];
-	}
-	
-	// if no error, returns the info about the exercise
-	const fileContent = fs.readFileSync(filepath, 'utf8');
-	const lines = fileContent.split('\n');
-	for (let i = 0; i < lines.length; i++) {
-		var line = lines[i];
-		if (line.includes(label)) {
-			// get the type of exercise (python, devoir, ...)
-			var startIndex = line.lastIndexOf('[') + 1;
-			var endIndex = line.lastIndexOf(']');
-			const typeExo = line.substring(startIndex, endIndex);
-			// get the difficulty of the exercise (on, two, three stars)
-			var startIndex = line.indexOf('[') + 1;
-			var endIndex = line.indexOf(']');
-			const difficulty = line.substring(startIndex, endIndex);
-			return [typeExo, difficulty];
-			}
-		}
-		return ['undefined','undefined'];
-	}
-
-function generateTreeItems() {
+function generateTreeItems(collapsedState = undefined) {
 
 	// absolute path to the recueil directory
 	var BanquePath = vscode.workspace.getConfiguration('banque').get('path');
@@ -63,41 +36,44 @@ function generateTreeItems() {
 				return new TreeItem(basename, // chapter level
 					exercices.map(function (exo) {
 						// get exercise name
-						var start = exo.indexOf('{', exo.indexOf('{') + 1) + 1;
-						var end = exo.indexOf('}', exo.indexOf('}') + 1);
-						var exo = exo.substring(start, end);
-						var [typeExo, difficulty] = GetTypeExo(exo, filePath);
-						// if (difficulty === '') {
-						// 	// add this exercise to a file that stores all exercices where the difficulty is not specified
-						// 	// this will be used by the suggestions tree view panel
-						// 	fs.appendFileSync(suggestion_liste, filePath + ':' + exo + '\n');
-						// }
-						return new TreeItem(exo,      				// label
+						var start = exo.lastIndexOf('{') + 1;
+						var end = exo.lastIndexOf('}');
+						const exoName = exo.substring(start, end);
+						// get exercise type
+						var start = exo.lastIndexOf('[') + 1;
+						var end = exo.lastIndexOf(']');
+						const typeExo = exo.substring(start, end);
+						// get exercise difficulty
+						var start = exo.indexOf('[') + 1;
+						var end = exo.indexOf(']');
+						const difficulty = exo.substring(start, end);
+						// return exercise tree item
+						return new TreeItem(exoName,      			// label
 											undefined, 				// children
 											filePath,  				// filePath
 											'file',    				// contextValue
-											undefined, 				// collapsed
+											undefined,				// collapsed
 											typeExo,   				// typeExo
 											difficulty,			  	// difficulty
 											basename,				// chapter
 											theme.toUpperCase()); 	// theme
-					}),
+					}),					// children
 					filePath, 			// filePath
 					'chapter', 			// contextValue
-					undefined, 			// collapsed
+					collapsedState,		// collapsed
 					undefined, 			// typeExo
 					undefined,			// difficulty
 					basename, 			// chapter
 					theme.toUpperCase() // theme
 				);
-			}),
-			undefined, // filePath
-			'folder',  // contextValue
-			undefined, // collapsed
-			undefined, // typeExo
-			undefined, // difficulty
-			undefined, // chapter
-			theme.toUpperCase()  // theme
+			}),					// children
+			undefined, 			// filePath
+			'folder',  			// contextValue
+			collapsedState, 	// collapsed
+			undefined, 			// typeExo
+			undefined, 			// difficulty
+			undefined, 			// chapter
+			theme.toUpperCase() // theme
 		);
 	});
 
@@ -111,8 +87,10 @@ function generateTreeItems() {
 
 // TREE VIEW CLASS //
 class BanqueExoShow {
-    constructor() {
-		this.data = generateTreeItems();
+
+	// constructor
+    constructor(collapsedState = undefined) {
+		this.data = generateTreeItems(collapsedState);
     }
 
 	// define here the command to call when clicking on the tree items
@@ -131,6 +109,7 @@ class BanqueExoShow {
 		return item;
 	};
 
+	// define here the children of the tree items
     getChildren(element) {
         if (element === undefined) {
             return this.data;
@@ -138,8 +117,9 @@ class BanqueExoShow {
         return element.children;
     };
 
+
+	// get the parent of the tree item with the given label
 	getParent(element) {
-		// get the parent of the tree item with the given label
 		const treeItems = this.data;
 		for (let i = 0; i < treeItems.length; i++) {
 			if (treeItems[i].label === element.label) {
@@ -160,6 +140,7 @@ class BanqueExoShow {
 		}
 	}
 	
+	// get the tree item with the given label
 	getTreeItemByLabel(folderName,filename,label) {
 		// get the tree item with the given label
 		const treeItems = this.data;
@@ -187,6 +168,7 @@ class BanqueExoShow {
 		}
 	}
 
+	// get the tree item with the given label
 	resolveTreeItem(item) {
 		item.tooltip = item.filePath;
 		return item;
@@ -196,5 +178,4 @@ class BanqueExoShow {
 
 // EXPORTS //
 module.exports = BanqueExoShow
-module.exports.GetTypeExo = GetTypeExo
 // ---------------------------------- //

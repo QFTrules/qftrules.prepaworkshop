@@ -4,7 +4,7 @@
 	"description": "Espace de travail pour gérer les documents pédagogiques en CPGE scientifique.",
 	"version": "1.0.3",
 	"publisher": "qft-rules",
-	"icon": "images/icon_extension.png",
+	"icon": "images/icon.jpg",
 	"engines": {
 		"vscode": "^1.85.0"
 	},
@@ -31,7 +31,7 @@
 				{
 					"id": "package-explorer",
 					"title": "CPGE",
-					"icon": "images/atom2.png"
+					"icon": "images/graduation-cap-solid-light.svg"
 				}
 			]
 		},
@@ -91,6 +91,11 @@
 				"command": "banque.refresh",
 				"title": "Rafraîchir",
 				"icon": "$(refresh)"
+			},
+			{
+				"command": "banque.collapse",
+				"title": "Réduire",
+				"icon": "$(collapse-all)"
 			}
 		],
 		"menus": {
@@ -123,6 +128,11 @@
 					"command": "banque.refresh",
 					"when": "view == banque-exercices",
 					"group": "navigation@4"
+				},
+				{
+					"command": "banque.collapse",
+					"when": "view == banque-exercices",
+					"group": "navigation@5"
 				}
 			]
 		},

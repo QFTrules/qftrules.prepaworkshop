@@ -4,7 +4,6 @@
 var vscode = require('vscode');
 const path = require('path');
 // Object.defineProperty(exports, "__esModule", { value: true });
-// import { DepNodeProvider, Dependency } from './treeview';
 
 // define action in the tree view
 var __extends = (this && this.__extends) || (function () {

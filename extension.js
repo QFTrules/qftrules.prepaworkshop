@@ -24,14 +24,10 @@ function findDirectories(basePath, dirName) {
     for (const item of items) {
         if (item.isDirectory()) {
 			var fullPath = basePath + item.name + '/';
-            // var fullPath = path.join(basePath, item.name);
 			if (item.name.includes(dirName)) {
 				results.push(fullPath);
 			}
             results = results.concat(findDirectories(fullPath, dirName));
-	
-
-
         }
     }
 
@@ -53,7 +49,6 @@ function insertLatexMagic(editor, rootFile) {
 			// delete the line
 			editBuilder.delete(line.range);
 			// insert the magic line at the beginning of the file
-			// editBuilder.insert(new vscode.Position(0, 0), latex_magic);
 		}).then(() => {
 			editor.edit(editBuilder => {
 				editBuilder.insert(new vscode.Position(0, 0), latex_magic);
@@ -69,17 +64,14 @@ function insertLatexMagic(editor, rootFile) {
 
 // update the graphics path in exercice.sty
 function update_graphics_path() {
-	// vscode.window.showInformationMessage('Mise à jour du chemin des figures dans exercice.sty.');
 	// find all subdirectories, WHATEVER THE DEPTH, within directory BanquePath that are called /Figures/
 	const directories = findDirectories(BanquePath, 'Figures');
 	// vscode.window.showInformationMessage(directories.toString());
 
 	// latex line to add (string)
 	const graphics_path = '\n% Added by qft-rules.prepaworkshop on start-up\n\\graphicspath{{' + directories.join('}{') + '}}';
-	// vscode.window.showInformationMessage(graphics_path);
 	// latex path to exercice.sty
 	const exercice_sty = templatePath + '/exercice.sty';
-	// vscode.window.showInformationMessage(exercice_sty);
 	// read the file
 	const data = fs.readFileSync(exercice_sty, 'utf8');
 	// remove the command \\graphicspath if present
@@ -90,12 +82,7 @@ function update_graphics_path() {
 		fs.writeFileSync(exercice_sty, newData);
 	}
 	// add the line graphics_path
-	// if (!data.includes(graphics_path)) {
 	fs.appendFileSync(exercice_sty, graphics_path);
-	// } else {
-		// throw an error
-		// vscode.window.showErrorMessage('La commande latex \\graphicspath est déjà définie.');
-	// }
 }
 
 // ---------------------------------- //
@@ -138,6 +125,7 @@ function activate() {
 		}
 	)
 
+	// FUNCTIONS OF VIEW - ITEM - THEME //
 	// copy the latex file and use it as a source in an exercise latex document (TD, ...)
 	vscode.commands.registerCommand('banque.source', function (document) {
 		// open the latex document in vscode
@@ -151,18 +139,30 @@ function activate() {
 		}
 	})
 
-	// copy the latex file and use it as a source in an exercise latex document (TD, ...)
+	// open the latex file containing exercises in vscode
 	vscode.commands.registerCommand('banque.open', function (document) {
 		// open the latex document in vscode
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.file(document.filePath), { viewColumn: vscode.ViewColumn.One });
 	})
 
+	// FUNCTIONS OF VIEW - TITLE //
 	// refresh the tree view of banque exercices
 	vscode.commands.registerCommand('banque.refresh', () => {
-		const banque_exercices = new BanqueExoShow();
-		vscode.window.registerTreeDataProvider('banque-exercices', banque_exercices);
+		// save current files opened in editor
+		vscode.commands.executeCommand('workbench.action.files.saveAll').then(() => {
+		vscode.window.registerTreeDataProvider('banque-exercices', new BanqueExoShow());
+		});
+		// vscode.commands.executeCommand("workbench.actions.treeView.banque-exercices.refresh");
 	});
 
+	// collapse all items in the tree view
+	vscode.commands.registerCommand('banque.collapse', () => {
+		vscode.commands.executeCommand("workbench.actions.treeView.banque-exercices.collapseAll");
+		// const banque_exercices = new BanqueExoShow(collapsedState = vscode.TreeItemCollapsibleState.Expanded);
+		// vscode.window.registerTreeDataProvider('banque-exercices', banque_exercices);
+	});
+
+	// FUNCTIONS OF VIEW - ITEM - EXERCICE //
 	// fetch a string in a latex file, like exercise name of balise
 	vscode.commands.registerCommand('banque.fetch', function (doc) {
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.file(doc.filePath), { viewColumn: vscode.ViewColumn.One }).then(() => {
@@ -197,7 +197,8 @@ function activate() {
 			editor.revealRange(range, vscode.TextEditorRevealType.AtTop);
 		});
 	})
-			
+	
+	// FUNCTIONS OF VIEW - ITEM - EXERCICE INLINE //
 	// command to compile an exercise separately
 	vscode.commands.registerCommand('banque.compile', function (document) {
 		
@@ -260,18 +261,16 @@ function activate() {
 		
 	});
 
-	// command to reveal an exercise in tree view
+	// FUNCTIONS ONLY USED AS KEYBINDINGS //
+	// command to reveal an exercise of a latex file in the tree view
 	vscode.commands.registerCommand('banque.reveal', function () {
 		
-		// vscode.window.showInformationMessage(document.filePath);
 		// get the active text editor
 		let editor = vscode.window.activeTextEditor;
 		if (!editor) {
 			return;
 		}
 	
-		// vscode.window.showInformationMessage(folderName, fileName);
-
 		// get label of exercise from current mouse position
 		const cursorPosition = editor.selection.active;
 		const editorText = editor.document.getText();
@@ -303,7 +302,6 @@ function activate() {
 			var fileName = lineText.substring(start, end);
 			var folderName = 'undefined';
 		}
-		// vscode.window.showInformationMessage(fileName, folderName, exo);
 		// hihglight the exercise in the editor
 		vscode.commands.executeCommand('extension.selectCurlyBrackets', {label: exo});
 
@@ -314,8 +312,8 @@ function activate() {
 		TreeView.reveal(item, {focus: true, select: true, expand: true});
 	});
 
-	// call here all commands necessary at launch
-	vscode.commands.executeCommand('banque.refresh');
+	// COMMANDS AT LAUNCH //
+	vscode.window.registerTreeDataProvider('banque-exercices', new BanqueExoShow())
 	update_graphics_path();
 
 
