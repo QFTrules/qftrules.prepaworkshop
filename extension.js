@@ -202,17 +202,18 @@ function activate() {
 	// command to compile an exercise separately
 	vscode.commands.registerCommand('banque.compile', function (document) {
 		
-		// get the active text editor
-		let editor = vscode.window.activeTextEditor;
-		if (!editor) {
-		}
-		
 		let exoenvi = 'exo';
 		// string to search in the document
 		const searchString = '\\begin{' + exoenvi +'}';
 
-		// check if command called from the explorer context menu or from the editor (document undefined)
+		// get the active text editor
+		let editor = vscode.window.activeTextEditor;
+		if (!editor) {
+		}
+
+		// if command called from the editor
 		if (document === undefined) {
+
 			// declare the cursorPosition variable
 			const cursorPosition = editor.selection.active;
 			// find the first line before the cursor position that contains the string '\begin{exo}'
@@ -235,12 +236,11 @@ function activate() {
 			var exo = lineText.substring(start, end);
 			var FilePath = editor.document.fileName;
 			// var SourceFile = path.basename(FilePath);
-		} else {
-			// vscode.window.showInformationMessage(document.label);
-			var exo = document.label.replace(/"/g, '');
+		} else {// command called from the explorer context menu
+			vscode.commands.executeCommand('banque.fetch', document);
+			var exo = document.label;
 			var FilePath = document.filePath;
-			// vscode.window.showInformationMessage(FilePath);
-			vscode.commands.executeCommand('vscode.open', vscode.Uri.file(FilePath), { 		viewColumn: vscode.ViewColumn.One });
+			// vscode.commands.executeCommand('vscode.open', vscode.Uri.file(FilePath), { 		viewColumn: vscode.ViewColumn.One });
 		}
 
 		// name of temporary latex exercise file
