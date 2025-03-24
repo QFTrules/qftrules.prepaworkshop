@@ -149,7 +149,7 @@
 					"default": [
 						"/Figures/"
 					],
-					"description": "Définit les chemins d'accès relatifs vers les sous-dossiers du dossier contenant le recueil d'exercices, et défini par la variable *banque.path*, qui doivent être exclus de l'affichage dans la vue *banque d'exercices*."
+					"description": "Définit les chemins d'accès relatifs vers les sous-dossiers de banque.path qui doivent être exclus de l'affichage dans la vue banque d'exercices."
 				}
 			}
 		}

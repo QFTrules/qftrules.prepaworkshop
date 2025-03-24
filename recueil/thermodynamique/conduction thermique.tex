@@ -41,8 +41,7 @@ dt = 4e-1
 L  = 1
 Deltat = 30*60
 \end{minted}
-    \solution*{
-\begin{minted}{python}
+\begin{mintedSolution}{python}
 Nx = int(L/dx) + 1
 Nt = int(Deltat/dt) + 1
 
@@ -50,19 +49,16 @@ T = np.zeros((Nt,Nx))
 
 x = np.array([j*dx for j in range(Nx)])
 t = np.array([i*dt for i in range(Nt)])
-\end{minted}
-    }
+\end{mintedSolution}
     \item On suppose que le profil de température initial a pour expression 
     $$
     T(x,t=0) = T_0 \sin (2\pi x/L),
     $$
     avec $T_0 = \SI{20}{\degree C}$. Remplir la première ligne du tableau \texttt{T} pour spécifier les conditions initiales de l'expérience.
-\solution{
-% \begin{minted}{python}
-% T0 = 20
-% T[0,:] = T0*np.sin(2*np.pi*x/L)
-% \end{minted}
-    }
+\begin{mintedSolution}{python}
+T0 = 20
+T[0,:] = T0*np.sin(2*np.pi*x/L)
+\end{mintedSolution}
     \item Compléter le code suivant pour tracer l'évolution de la température initiale au sein de la barre.
 \begin{minted}{python}
 plt.close()
@@ -72,25 +68,21 @@ plt.xlabel("x (m)")
 plt.ylabel("T (°C)")
 plt.title("Profil de température initial")
 \end{minted}
-    % \solution{
-\begin{minted}{python}
+\begin{mintedSolution}{python}
 plt.plot(x,T[0,:])
 plt.show()
-\end{minted}
-    % }
+\end{mintedSolution}
     \end{questions}
     
     
     \begin{questions}
       \item	
       Remplir le tableau \texttt{T} de manière à imposer, à tout instant, les conditions aux limites aux deux extrémités de la barre, $T(x=0,t)=0$ et $T(x=L,t)=0$.
-      % \solution{
-        \begin{minted}{python}
+        \begin{mintedSolution}{python}
         for i in range (1,Nt): # l'instant initial a déjà été traité
           T[i,0]  = 0
           T[i,-1] = 0
-        \end{minted}
-        % }
+        \end{mintedSolution}
       \end{questions}
       
       \paragraph{Discrétisation de l'équation de diffusion}
@@ -138,35 +130,31 @@ En isolant $f''(x)$, on obtient bien la relation souhaitée.
       On peut montrer qu'un tel schéma numérique converge si $$\frac{\kappa \mathrm{d} t}{\mathrm{d} x^2}<\frac{1}{2}.$$ Avec les valeurs de $\mathrm{d} x$ et de $\mathrm{d} t$ choisies, cette condition est respectée pour la valeur choisie de la diffusivité thermique $\kappa=\SI{e-4}{m^2.s^{-1}}$.
       \begin{questions}
         \item	Implémenter ce schéma numérique en réalisant une boucle sur \texttt{i} et éventuellement sur \texttt{j} pour remplir le tableau \texttt{T} dans son intégralité.
-        % \solution{
-\begin{minted}{python}
+\begin{mintedSolution}{python}
 kappa = 1e-4
 for i in range(0,Nt-1): # on remplit à l'indice i+1
   for j in range(1,Nx-1): # les conditions aux limites sont déjà fixées
-  T[i+1,j]=T[i,j]+kappa*dt/(dx**2)*(T[i,j+1]+T[i,j-1]-2*T[i,j])
-\end{minted}
-        % }
+    T[i+1,j]=T[i,j]+kappa*dt/(dx**2)*(T[i,j+1]+T[i,j-1]-2*T[i,j])
+\end{mintedSolution}
         \item On souhaite tracer le profil de température aux différents instants définis dans la liste ci-dessous. Compléter le code ci-dessous de sorte à tracer sur un même graphique légendé l'évolution du profil de température dans le temps.
-    %     \begin{minted}{python}
-    %     plt.close()
-    %     plt.figure()
-    %     plt.grid()
-    %     plt.xlabel("x (m)")
-    %     plt.ylabel("T (°C)")
-    %     plt.title("Profil de température dans la barre à différents instants")
-    
-    %     instants = [0,1,3,6,9,12,15,30] # instants choisis en minutes
-    % \end{minted}
-    % % \solution{
-    %   \begin{minted}{python}
-    %   for t in instants: # tracé du profil du température aux instants choisis
-    %     i = int(t*60/dt)
-    %     plt.plot(x,T[i,:],label="t = "+str(t)+" min")
-        
-    % plt.legend()
-    % plt.show()
-    % \end{minted}
-    % }
-      \end{questions}
-    \end{exo}
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{minted}{python}
+plt.close()
+plt.figure()
+plt.grid()
+plt.xlabel("x (m)")
+plt.ylabel("T (°C)")
+plt.title("Profil de température dans la barre à différents instants")
+
+instants = [0,1,3,6,9,12,15,30] # instants choisis en minutes
+\end{minted}
+\begin{mintedSolution}{python}
+for t in instants: # tracé du profil du température aux instants choisis
+  i = int(t*60/dt)
+  plt.plot(x,T[i,:],label="t = "+str(t)+" min")
+  
+plt.legend()
+plt.show()
+\end{mintedSolution}
+\end{questions}
+\end{exo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

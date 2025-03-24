@@ -7,7 +7,7 @@
 [![downloads](https://img.shields.io/visual-studio-marketplace/d/qft-rules.prepa-workshop)](https://vsmarketplacebadge.apphb.com/downloads-short/qft-rules.prepa-workshop.svg)
 [![installs](https://img.shields.io/visual-studio-marketplace/i/qft-rules.prepa-workshop)](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop)
 [![rating](https://img.shields.io/visual-studio-marketplace/r/qft-rules.prepa-workshop)](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop)
-[![license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://raw.githubusercontent.com/James-Yu/LaTeX-Workshop/master/LICENSE.txt)
+[![License: CC BY 4.0](https://licensebuttons.net/l/by/4.0/80x15.png)](https://creativecommons.org/licenses/by/4.0/)
 
 [![TeX Live on Windows](https://github.com/James-Yu/LaTeX-Workshop/workflows/TeX%20Live%20on%20Windows/badge.svg)](https://github.com/James-Yu/LaTeX-Workshop/actions?query=workflow%3A%22TeX+Live+on+Windows%22)
 [![TeX Live on macOS](https://github.com/James-Yu/LaTeX-Workshop/workflows/TeX%20Live%20on%20macOS/badge.svg)](https://github.com/James-Yu/LaTeX-Workshop/actions?query=workflow%3A%22TeX+Live+on+macOS%22)
@@ -26,3 +26,5 @@ Cette extension nécessite l'extension [Latex Workshop](https://marketplace.visu
 - [Accueil](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Accueil)
 - [Vues arborescentes](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Vues-arborescentes)
   - [Banque d'exercices](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/banque-d'exercices)
+  - [Programme de colle](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Programme-de-colle)
+- [Configurations](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Configurations)

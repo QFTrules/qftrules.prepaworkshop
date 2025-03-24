@@ -1,0 +1,12 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{for} \PYG{n}{t} \PYG{o+ow}{in} \PYG{n}{instants}\PYG{p}{:} \PYG{c+c1}{\PYGZsh{} tracé du profil du température aux instants choisis}
+  \PYG{n}{i} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{t}\PYG{o}{*}\PYG{l+m+mi}{60}\PYG{o}{/}\PYG{n}{dt}\PYG{p}{)}
+  \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,}\PYG{n}{T}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,:],}\PYG{n}{label}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}t = \PYGZdq{}}\PYG{o}{+}\PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{t}\PYG{p}{)}\PYG{o}{+}\PYG{l+s+s2}{\PYGZdq{} min\PYGZdq{}}\PYG{p}{)}
+
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{()}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+\PYGZbs{}\PYG{n}{end}\PYG{p}{\PYGZob{}}\PYG{n}{mintedSolution}\PYG{p}{\PYGZcb{}}
+      \PYGZbs{}\PYG{n}{end}\PYG{p}{\PYGZob{}}\PYG{n}{questions}\PYG{p}{\PYGZcb{}}
+    \PYGZbs{}\PYG{n}{end}\PYG{p}{\PYGZob{}}\PYG{n}{exo}\PYG{p}{\PYGZcb{}}
+    \PYG{o}{\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}\PYGZpc{}}
+\end{Verbatim}

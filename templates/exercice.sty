@@ -107,7 +107,6 @@
 
 % environnement questions
 \usepackage{enumitem}
-\usepackage{enumitem}
 \newenvironment{questions}[1][\arabic]
 {%
 	\begin{enumerate}[label=#1*)]%
@@ -148,43 +147,36 @@
 % -----------------------------
 
 % prédéfinit la commande solution, qui contient le corrigé d’une question
-\usepackage{xparse}
-% \makeatletter
-% \newcommand{\solution}{%
-% \@ifstar
-%   \solutionStar%
-%   \solutionNoStar%
-% }
-% \makeatother
-% \newcommand{\solutionStar}[1]{}
-% \newcommand{\solutionNoStar}[1]{}
+% \usepackage{xparse}
 \newcommand{\solution}[1]{}
-
+% \newenvironment{mintedSolution}[1]{}{}
+\newcommand{\solutionMinted}[1]{}
 
 % commande pour afficher le corrigé d’un exercice pour chaque question
 \newrobustcmd{\Corrige}{
   % redefine the solution command
   \renewcommand{\solution}[1]{
-    % \IfBooleanTF{##1}{
-    %   \begin{soluce*}
-    %     {##2}
-    %   \end{soluce*}
-    % }{
-      \begin{soluce}
-        {##1}
-      \end{soluce}
-    % }
+    \begin{soluce}
+      {##1}
+    \end{soluce}
   }
-  % \renewcommand{\solution}[1]{
-  %   \begin{soluce}
-  %     {##1}
-  %   \end{soluce}
-  % }
-  % % redefine the solution environment
-  % \WithSuffix\renewcommand\solution*[1]{
-  %   \begin{soluce*}
-  %     {##1}
-  %   \end{soluce*}
+
+  \renewcommand{\mintedSolution}[1]{
+
+    \noindent\iconSoluce~~\textbf{\textcolor{iconcolor}{Solution}}%
+    \vspace{0.25cm}%
+    \begin{minted}{python}
+      {##1}
+    \end{minted}
+  }
+  % redefine the mintedSolution environment
+  % \renewenvironment{mintedSolution}[1]{%
+
+  % \noindent\iconSoluce~~\textbf{\textcolor{iconcolor}{Solution}}%
+  % \vspace{0.25cm}%
+  % \begin{minted}{##1}%
+  % }{%
+  % \end{minted}%
   % }
 }
 
@@ -214,21 +206,6 @@
 ]{siderule}
 
 
-% environnement générique avec barre latérale
-\usepackage{changepage}
-% \makeatletter
-% \newenvironment{answer}{%
-% \vspace{0.1cm}%
-% \begin{adjustwidth}{1cm}{}%
-%   \begin{siderule}%
-%   \itshape%
-%  \footnotesize%
-% }{%
-%   \end{siderule}%
-%   \end{adjustwidth}%
-%   \normalsize%
-% }%
-% \makeatother
 
 
 \usepackage{fontawesome} % pour les icones fontwasome
@@ -238,6 +215,7 @@
 }
 
 % environnement spécifique pour les corrigés
+\usepackage{changepage} % for adjustwidth
 \newenvironment{soluce}{%
 \noindent\iconSoluce~~\textbf{\textcolor{iconcolor}{Solution}}%
 \vspace{0.25cm}%
@@ -256,22 +234,6 @@
   % }%
   \normalsize%
 }%
-
-% % define soluce* environment for minted code
-% \newenvironment{soluce*}{}
-% {%
-% % \noindent\iconSoluce~~\textbf{\textcolor{iconcolor}{Solution}}%
-% % \vspace{0.25cm}%
-% % \begin{adjustwidth}{1cm}{}%
-%   % \begin{siderule}%
-%   % \itshape%
-%   % \footnotesize%
-% }{%
-%   % \end{siderule}%
-% % \end{adjustwidth}%
-% % \normalsize%
-% }%
-
 
 
 %%% EXERCICE %%%
