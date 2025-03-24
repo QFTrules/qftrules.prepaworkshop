@@ -83,3 +83,5 @@ Les macros LaTeX sont les suivantes.
 
 La compilation des codes python, délimités par les environnements ```minted``` ou ```mintedSolution```, nécessite d'appeler la fonction ```pdflatex``` avec l'option ```--shell-escape```. Pensez à ajouter cette option à votre recette de compilation par défaut dans les configurations de l'extension [Latex Workshop](https://marketplace.visualstudio.com/items?itemName=James-Yu.latex-workshop).
 
+# Mises à jour
+Les mises à jour sont indiquées sur le [*commit graph*](https://github.com/QFTrules/qftrules.prepaworkshop/commits/master/) du dépôt github de l'extension.
