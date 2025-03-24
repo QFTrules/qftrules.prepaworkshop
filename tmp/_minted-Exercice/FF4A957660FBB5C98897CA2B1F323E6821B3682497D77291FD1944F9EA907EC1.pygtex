@@ -1,0 +1,28 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{Nx} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{L}\PYG{o}{/}\PYG{n}{dx}\PYG{p}{)} \PYG{o}{+} \PYG{l+m+mi}{1}
+\PYG{n}{Nt} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{Deltat}\PYG{o}{/}\PYG{n}{dt}\PYG{p}{)} \PYG{o}{+} \PYG{l+m+mi}{1}
+
+\PYG{n}{T} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{((}\PYG{n}{Nt}\PYG{p}{,}\PYG{n}{Nx}\PYG{p}{))}
+
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{([}\PYG{n}{j}\PYG{o}{*}\PYG{n}{dx} \PYG{k}{for} \PYG{n}{j} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{Nx}\PYG{p}{)])}
+\PYG{n}{t} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{([}\PYG{n}{i}\PYG{o}{*}\PYG{n}{dt} \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{Nt}\PYG{p}{)])}
+\PYGZbs{}\PYG{n}{end}\PYG{p}{\PYGZob{}}\PYG{n}{mintedSolution}\PYG{p}{\PYGZcb{}}
+
+    \PYGZbs{}\PYG{n}{item} \PYG{n}{On} \PYG{n}{suppose} \PYG{n}{que} \PYG{n}{le} \PYG{n}{profil} \PYG{n}{de} \PYG{n}{température} \PYG{n}{initial} \PYG{n}{a} \PYG{n}{pour} \PYG{n}{expression}
+    \PYG{err}{\PYGZdl{}\PYGZdl{}}
+    \PYG{n}{T}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,}\PYG{n}{t}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{)} \PYG{o}{=} \PYG{n}{T\PYGZus{}0} \PYGZbs{}\PYG{n}{sin} \PYG{p}{(}\PYG{l+m+mi}{2}\PYGZbs{}\PYG{n}{pi} \PYG{n}{x}\PYG{o}{/}\PYG{n}{L}\PYG{p}{),}
+    \PYG{err}{\PYGZdl{}\PYGZdl{}}
+    \PYG{n}{avec} \PYG{err}{\PYGZdl{}}\PYG{n}{T\PYGZus{}0} \PYG{o}{=} \PYGZbs{}\PYG{n}{SI}\PYG{p}{\PYGZob{}}\PYG{l+m+mi}{20}\PYG{p}{\PYGZcb{}\PYGZob{}}\PYGZbs{}\PYG{n}{degree} \PYG{n}{C}\PYG{p}{\PYGZcb{}}\PYG{err}{\PYGZdl{}}\PYG{o}{.} \PYG{n}{Remplir} \PYG{n}{la} \PYG{n}{première} \PYG{n}{ligne} \PYG{n}{du} \PYG{n}{tableau} \PYGZbs{}\PYG{n}{texttt}\PYG{p}{\PYGZob{}}\PYG{n}{T}\PYG{p}{\PYGZcb{}} \PYG{n}{pour} \PYG{n}{spécifier} \PYG{n}{les} \PYG{n}{conditions} \PYG{n}{initiales} \PYG{n}{de} \PYG{n}{l}\PYG{l+s+s1}{\PYGZsq{}expérience.}
+\PYGZbs{}\PYG{n}{begin}\PYG{p}{\PYGZob{}}\PYG{n}{mintedSolution}\PYG{p}{\PYGZcb{}\PYGZob{}}\PYG{n}{python}\PYG{p}{\PYGZcb{}}
+\PYG{n}{T0} \PYG{o}{=} \PYG{l+m+mi}{20}
+\PYG{n}{T}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,:]} \PYG{o}{=} \PYG{n}{T0}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{sin}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{o}{*}\PYG{n}{x}\PYG{o}{/}\PYG{n}{L}\PYG{p}{)}
+\PYGZbs{}\PYG{n}{end}\PYG{p}{\PYGZob{}}\PYG{n}{mintedSolution}\PYG{p}{\PYGZcb{}}
+    \PYGZbs{}\PYG{n}{item} \PYG{n}{Compléter} \PYG{n}{le} \PYG{n}{code} \PYG{n}{suivant} \PYG{n}{pour} \PYG{n}{tracer} \PYG{n}{l}\PYG{l+s+s1}{\PYGZsq{}évolution de la température initiale au sein de la barre.}
+\PYGZbs{}\PYG{n}{begin}\PYG{p}{\PYGZob{}}\PYG{n}{minted}\PYG{p}{\PYGZcb{}\PYGZob{}}\PYG{n}{python}\PYG{p}{\PYGZcb{}}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{close}\PYG{p}{()}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{figure}\PYG{p}{()}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{grid}\PYG{p}{()}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}x (m)\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}T (°C)\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Profil de température initial\PYGZdq{}}\PYG{p}{)}
+\end{Verbatim}

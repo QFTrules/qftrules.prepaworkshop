@@ -149,8 +149,23 @@
 % prédéfinit la commande solution, qui contient le corrigé d’une question
 % \usepackage{xparse}
 \newcommand{\solution}[1]{}
-% \newenvironment{mintedSolution}[1]{}{}
-\newcommand{\solutionMinted}[1]{}
+\newenvironment{mintedSolution}[1]{}{}
+% \newcommand{\mintedSolution}[1]{}
+% \makeatletter
+% \newcommand{\mintedSolution}{%
+%   \begingroup
+%   \let\do\@makeother\dospecials
+%   \catcode`\{=1
+%   \catcode`\}=2
+%   \endlinechar`\^^J
+%   \foo@i}
+% \newcommand{\mintedSolution@i}[1]{%
+%   \endgroup\scantokens{#1\noexpand}%
+%   \expandafter\foo@cleanup}
+% \def\foo@cleanup#1^^J{#1 }
+% %http://tex.stackexchange.com/questions/71049/allow-macro-to-end-without-new-line
+% \makeatother
+
 
 % commande pour afficher le corrigé d’un exercice pour chaque question
 \newrobustcmd{\Corrige}{
@@ -161,23 +176,45 @@
     \end{soluce}
   }
 
-  \renewcommand{\mintedSolution}[1]{
+  % \renewcommand{\mintedSolution}[1]
+  % {
+  % \makeatletter
+  % \renewcommand{\mintedSolution}{%
+  %   \begingroup
+  %   \let\do\@makeother\dospecials
+  %   \catcode`\{=1
+  %   \catcode`\}=2
+  %   \endlinechar`\^^J
+  %   \mintedSolution@i}
+  % \newcommand{\mintedSolution@i}[1]{%
+  %   \endgroup\scantokens{
+  %     \noindent\iconSoluce~~\textbf{\textcolor{iconcolor}{Solution}}
+  %     \vspace{0.25cm}
+  %     \begin{minted}{python}
+  %       {##1}
+  %     \end{minted}
+  %   \noexpand}%
+  %   \expandafter\foo@cleanup}
+  % \def\mintedSolution@cleanup##1^^J{#1 }
+  %http://tex.stackexchange.com/questions/71049/allow-macro-to-end-without-new-line
+  % \makeatother
 
-    \noindent\iconSoluce~~\textbf{\textcolor{iconcolor}{Solution}}%
-    \vspace{0.25cm}%
-    \begin{minted}{python}
-      {##1}
-    \end{minted}
-  }
-  % redefine the mintedSolution environment
-  % \renewenvironment{mintedSolution}[1]{%
 
-  % \noindent\iconSoluce~~\textbf{\textcolor{iconcolor}{Solution}}%
-  % \vspace{0.25cm}%
-  % \begin{minted}{##1}%
-  % }{%
-  % \end{minted}%
   % }
+  % redefine the mintedSolution environment
+  \renewenvironment{mintedSolution}[1]{%
+  
+  \noindent\iconSoluce~~\textbf{\textcolor{iconcolor}{Solution}}%
+  \vspace{0.25cm}%
+  \footnotesize%
+  \VerbatimEnvironment%
+  \begin{adjustwidth}{1cm}{}%
+  \begin{minted}{##1}%
+  }{%
+  \end{minted}%
+  \end{adjustwidth}%
+  \normalsize%
+  }
 }
 
 
@@ -217,22 +254,17 @@
 % environnement spécifique pour les corrigés
 \usepackage{changepage} % for adjustwidth
 \newenvironment{soluce}{%
+
 \noindent\iconSoluce~~\textbf{\textcolor{iconcolor}{Solution}}%
 \vspace{0.25cm}%
-% \IFBooleanTF{#1}{%
-  \begin{adjustwidth}{1cm}{}%
+\begin{adjustwidth}{1cm}{}%
   \begin{siderule}%
-  \itshape%
-  % }{%
-  % }%
-  \footnotesize%
+    \itshape%
+    \footnotesize%
 }{%
-% \IFBooleanTF{#1}{%
+    \normalsize%
   \end{siderule}%
-  \end{adjustwidth}%
-  % }{%
-  % }%
-  \normalsize%
+\end{adjustwidth}%
 }%
 
 

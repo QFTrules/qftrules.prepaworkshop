@@ -32,6 +32,15 @@
                 "\\solution{\n\t$0\n}"
             ],
             "description": "Insère une commande solution dans l'environnement questions."
+        },
+        "MintedSolution" : {
+            "prefix": ["mintedSolution", "\\mintedSolution"],
+            "body": [
+                "\\begin{MintedSolution}{${1:python}}",
+                "\t$0",
+                "\\end{MintedSolution}"
+            ],
+            "description": "Insère un environnement minted imbriqué dans un environnement solution."
         }
     }
 }
