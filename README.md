@@ -15,7 +15,7 @@
 
 # Accueil
 
-[Prépa Workshop](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop) est une extension de [Visual Studio Code](https://code.visualstudio.com/), dont le but est de fournir un espace de travail aux enseignants en CPGE scientifique qui utilisent $\LaTeX{}$ sur [Visual Studio Code](https://code.visualstudio.com/).
+[Prépa Workshop](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop) est une extension de [Visual Studio Code](https://code.visualstudio.com/), dont le but est de fournir un espace de travail aux enseignants en CPGE scientifique qui utilisent LaTeX sur [Visual Studio Code](https://code.visualstudio.com/).
 
 
 ### Dépendances
