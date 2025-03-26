@@ -12,7 +12,44 @@ var BanquePath = vscode.workspace.getConfiguration('banque').get('path');
 if (BanquePath === '/recueil/') {
 	var BanquePath = __dirname + '/recueil/';
 }
-// ---------------------------------- //
+// check if path is valid
+if (!fs.existsSync(BanquePath)) {
+	vscode.window.showErrorMessage('Chemin d`accès banque.path invalide.');
+}
+
+// // ---------------------------------- //
+// // GLOBAL STORAGE PATH //
+// const globalStoragePath = vscode.workspace.getConfiguration('banque').get('globalStoragePath') || vscode.Uri.joinPath(vscode.env.globalStorageUri, 'banque').fsPath;
+
+// // Ensure the directory exists
+// if (!fs.existsSync(globalStoragePath)) {
+// 	fs.mkdirSync(globalStoragePath, { recursive: true });
+// }
+
+// // BACKUP MODIFIED FILES //
+// const backupPath = vscode.Uri.joinPath(vscode.env.globalStorageUri, 'backup').fsPath;
+
+// // Ensure the backup directory exists
+// if (!fs.existsSync(backupPath)) {
+// 	fs.mkdirSync(backupPath, { recursive: true });
+// }
+
+// // Function to backup files
+// function backup(filePath) {
+// 	const fileName = path.basename(filePath);
+// 	const backupFilePath = path.join(backupPath, fileName);
+
+// 	// Check if the file has been modified
+// 	if (fs.existsSync(filePath)) {
+// 		const originalContent = fs.readFileSync(filePath, 'utf8');
+// 		const backupContent = fs.existsSync(backupFilePath) ? fs.readFileSync(backupFilePath, 'utf8') : null;
+
+// 		if (originalContent !== backupContent) {
+// 			fs.writeFileSync(backupFilePath, originalContent);
+// 		}
+// 	}
+// }
+
 
 // AUXILIARY FUNCTIONS //
 
