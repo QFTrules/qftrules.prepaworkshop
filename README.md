@@ -36,7 +36,7 @@ Cette extension nécessite l'extension [Latex Workshop](https://marketplace.visu
 
 # Vues arborescentes
 
-L'extension [Prépa Workshop](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop) ajoute une icone à la barre des tâches (barre latérale à gauche) appelée CPGE. En cliquant sur l'icone CPGE, visual studio code affiche une liste de vues arborescentes. Ces vues arborescentes sont intitulées : 
+L'extension [Prépa Workshop](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop) ajoute une icône à la barre des tâches (barre latérale à gauche) appelée CPGE. En cliquant sur l’icône CPGE, visual studio code affiche une liste de vues arborescentes. Ces vues arborescentes sont intitulées : 
  - [banque d'exercices](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Banque-d'exercices) ;
  - [programme de colle](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/programme-de-colle) (en cours) ;
 
