@@ -185,18 +185,15 @@ function activate() {
 	// FUNCTIONS OF VIEW - TITLE //
 	// refresh the tree view of banque exercices
 	vscode.commands.registerCommand('banque.refresh', () => {
-		// save current files opened in editor
+		// save current files opened in editor, then register banque d'exercices tree view
 		vscode.commands.executeCommand('workbench.action.files.saveAll').then(() => {
 		vscode.window.registerTreeDataProvider('banque-exercices', new BanqueExoShow());
 		});
-		// vscode.commands.executeCommand("workbench.actions.treeView.banque-exercices.refresh");
 	});
 
 	// collapse all items in the tree view
 	vscode.commands.registerCommand('banque.collapse', () => {
 		vscode.commands.executeCommand("workbench.actions.treeView.banque-exercices.collapseAll");
-		// const banque_exercices = new BanqueExoShow(collapsedState = vscode.TreeItemCollapsibleState.Expanded);
-		// vscode.window.registerTreeDataProvider('banque-exercices', banque_exercices);
 	});
 
 	// FUNCTIONS OF VIEW - ITEM - EXERCICE //
@@ -272,12 +269,10 @@ function activate() {
 			const end = lineText.lastIndexOf('}');
 			var exo = lineText.substring(start, end);
 			var FilePath = editor.document.fileName;
-			// var SourceFile = path.basename(FilePath);
 		} else {// command called from the explorer context menu
 			vscode.commands.executeCommand('banque.fetch', document);
 			var exo = document.label;
 			var FilePath = document.filePath;
-			// vscode.commands.executeCommand('vscode.open', vscode.Uri.file(FilePath), { 		viewColumn: vscode.ViewColumn.One });
 		}
 
 		// name of temporary latex exercise file
