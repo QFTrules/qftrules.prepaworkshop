@@ -69,16 +69,16 @@ Cette vue arborescente correspond à une architecture réelle du dossier recueil
 
 Chaque exercice possède plusieurs caractéristiques, représentées par des données visuelles différentes. Ainsi l'exercice cité ci-dessus apparaît dans la vue arborescente comme :
 
-  > <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file_type_python.svg" alt="Type" width="20"> Résolution numérique de la diffusion thermique ★★★
+  > <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file_type_python.pmg" alt="Type" width="20"> Résolution numérique de la diffusion thermique ★★★
 
 
 Ces données, listées de gauche à droite, sont les suivantes.
- - <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file_type_python.svg" alt="Type" width="20"> : type d’exercice ;
+ - <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file_type_python.png" alt="Type" width="20"> : type d’exercice ;
  - Résolution numérique de la diffusion thermique : nom de l’exercice ;
  - ★★★ : difficulté de l’exercice (nombre d’étoiles illimitée).
 
 Le type d'exercices précise de quel nature ou à quel usage se destine l'exercice. Les types d'exercices disponibles sont : 
-- capacité numérique en python : <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file_type_python.svg" alt="Type" width="20">
+- capacité numérique en python : <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file_type_python.png" alt="Type" width="20">
 - exercice de TD : <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/pencil_dark.png" alt="Type" width="20">
 - exercice de colle : <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/chalkboard_dark.png" alt="Type" width="20">
 - devoir ou partie d’un devoir : <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/paper_dark.png" alt="Type" width="20">
@@ -105,10 +105,10 @@ L’extension Prépa Workshop utilise plusieurs paramètres de configurations. L
 ## Raccourcis clavier
 Voici la liste de raccourcis clavier des commandes de l’extension, toutes modifiables par l’utilisateur depuis la palette de commandes de VSCode.
  - ```workbench.view.extension.package-explorer```
-   - Action : ouvre la vue arborescente de l’extension. Équivaut à cliquer sur l’icône de l’extension  <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/graduation-cap-solid_dark.svg" alt="" width="20"> dans la barre des tâches latérale à gauche de l’éditeur.
+   - Action : ouvre la vue arborescente de l’extension. Équivaut à cliquer sur l’icône de l’extension  <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/graduation-cap-solid_dark.png" alt="" width="20"> dans la barre des tâches latérale à gauche de l’éditeur.
    - Clé par défaut : ```ctrl+shift+p```
 - ```banque.compile```
-   - Action : compile l’exercice, soit depuis la vue arborescente en cliquant sur l’icône <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file-pdf-solid_dark.svg" alt="" width="20">, soit depuis l’éditeur, auquel cas l’exercice est repéré par la position courante du curseur.
+   - Action : compile l’exercice, soit depuis la vue arborescente en cliquant sur l’icône <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file-pdf-solid_dark.png" alt="" width="20">, soit depuis l’éditeur, auquel cas l’exercice est repéré par la position courante du curseur.
    - clé par défaut : ```alt+f1```
 
 
