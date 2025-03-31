@@ -2,7 +2,7 @@
 	"name": "prepa-workshop",
 	"displayName": "Prépa Workshop",
 	"description": "Espace de travail pour gérer les documents pédagogiques en CPGE scientifique.",
-	"version": "1.2.3",
+	"version": "1.3.0",
 	"publisher": "qft-rules",
 	"icon": "images/icon.jpg",
 	"engines": {
