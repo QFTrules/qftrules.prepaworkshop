@@ -29,10 +29,13 @@ Cette extension nécessite l'extension [Latex Workshop](https://marketplace.visu
 - [Vues arborescentes](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Vues-arborescentes)
   - [Banque d'exercices](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/banque-d'exercices)
   - [Programme de colle](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Programme-de-colle)
-- [Configurations](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Configurations)
+- [Configurations de l’extension](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Configurations-de-l’extension)
+  - [Paramètres utilisateur](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Paramètres-utilisateur)
+  - [Raccourcis clavier](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Raccourscis-clavier)
 - [LaTeX](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/LaTeX)
   - [Macro LaTeX](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Macro-latex)
   - [Configurations LaTeX recommandées](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Configurations-LaTeX-recommandées)
+
 
 # Vues arborescentes
 
@@ -46,7 +49,51 @@ Cette vue arborescentes affiche l'ensemble des exercices présents dans le dossi
 ### Programme de colle
 En cours...
 
-# Configurations
+## Banque d’exercices
+
+Cette vue arborescentes affiche l'ensemble des exercices présents dans le dossier recueil dont le chemin d'accès est défini par la variable ```banque.path```. La valeur par défaut de cette variable est le dossier local de l'extension ```./recueil```, qui contient quelques sous-dossiers thématiques et fichiers latex de chapitres d'exercices pour l'exemple. 
+
+### Organisation de la vue arborescente
+
+La vue arborescente est organisée de la façon suivante *(exemple entre parenthèse)* : 
+ - thème *(THERMODYNAMIQUE)*
+   - chapitre *(conduction thermique)*
+     - exercice *(Résolution numérique de la diffusion thermique)*
+
+Cette vue arborescente correspond à une architecture réelle du dossier recueil de la forme : 
+ - dossier *(thermodynamique)*
+   - fichier latex *(conduction thermique.tex)*
+      - environnement ```exo``` *(Résolution numérique de la diffusion thermique)*
+
+### Données affiliées aux exercices
+
+Chaque exercice possède plusieurs caractéristiques, représentées par des données visuelles différentes. Ainsi l'exercice cité ci-dessus apparaît dans la vue arborescente comme :
+
+  > <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file_type_python.svg" alt="Type" width="20"> Résolution numérique de la diffusion thermique ★★★
+
+
+Ces données, listées de gauche à droite, sont les suivantes.
+ - <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file_type_python.svg" alt="Type" width="20"> : type d’exercice ;
+ - Résolution numérique de la diffusion thermique : nom de l’exercice ;
+ - ★★★ : difficulté de l’exercice (nombre d’étoiles illimitée).
+
+Le type d'exercices précise de quel nature ou à quel usage se destine l'exercice. Les types d'exercices disponibles sont : 
+- capacité numérique en python : <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file_type_python.svg" alt="Type" width="20">
+- exercice de TD : <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/pencil_dark.png" alt="Type" width="20">
+- exercice de colle : <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/chalkboard_dark.png" alt="Type" width="20">
+- devoir ou partie d’un devoir : <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/paper_dark.png" alt="Type" width="20">
+- résolution de problème : <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/gear-solid_dark.png" alt="Type" width="20">
+
+## Programme de colle
+En cours...
+
+# Configurations de l’extension
+
+L’utilisateur peut configurer l’extension [Prépa Workshop](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop), en modifiant : 
+- les [paramètres utilisateurs](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Paramètres-utilisateur) utilisés par les commandes de l’extension ;
+- les [raccourcis clavier](https://github.com/QFTrules/qftrules.prepaworkshop/wiki/Raccourscis-clavier) des commandes de l’extension.
+
+## Paramètres utilisateur
 L’extension Prépa Workshop utilise plusieurs paramètres de configurations. Les paramètres, tous modifiables par l’utilisateur, sont les suivants.
 - ```banque.path```
   - Valeur par défaut : ```/recueil/```.
@@ -54,6 +101,16 @@ L’extension Prépa Workshop utilise plusieurs paramètres de configurations. L
 - ```banque.exclude```
    - Valeur par défaut : ```/Figures/```.
    - Définit les chemins d'accès relatifs vers les sous-dossiers de *banque.path* qui doivent être exclus de l'affichage dans la vue *banque d'exercices*. 
+
+## Raccourcis clavier
+Voici la liste de raccourcis clavier des commandes de l’extension, toutes modifiables par l’utilisateur depuis la palette de commandes de VSCode.
+ - ```workbench.view.extension.package-explorer```
+   - Action : ouvre la vue arborescente de l’extension. Équivaut à cliquer sur l’icône de l’extension  <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/graduation-cap-solid_dark.svg" alt="" width="20"> dans la barre des tâches latérale à gauche de l’éditeur.
+   - Clé par défaut : ```ctrl+shift+p```
+- ```banque.compile```
+   - Action : compile l’exercice, soit depuis la vue arborescente en cliquant sur l’icône <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file-pdf-solid_dark.svg" alt="" width="20">, soit depuis l’éditeur, auquel cas l’exercice est repéré par la position courante du curseur.
+   - clé par défaut : ```alt+f1```
+
 
 # LaTeX
 [Prépa Workshop](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop) utilise $\LaTeX{}$ comme langage source des fichiers contenant la banque d'exercices. Prépa Workshop définit ainsi :
