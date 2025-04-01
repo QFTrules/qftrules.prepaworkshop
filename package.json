@@ -63,13 +63,8 @@
 				"title": "Ouvrir exercice"
 			},
 			{
-				"command": "banque.copy",
+				"command": "banque.ajout-exercice",
 				"title": "Ajouter exercice",
-				"icon": "$(add)"
-			},
-			{
-				"command": "banque.source",
-				"title": "Ajouter source",
 				"icon": "$(add)"
 			},
 			{
@@ -103,17 +98,12 @@
 			"explorer/context": [],
 			"view/item/context": [
 				{
-					"command": "banque.copy",
-					"when": "view == banque-exercices && viewItem == file",
-					"group": "inline"
-				},
-				{
 					"command": "banque.compile",
 					"when": "view == banque-exercices && viewItem == file",
 					"group": "inline@-1"
 				},
 				{
-					"command": "banque.source",
+					"command": "banque.ajout-exercice",
 					"when": "view == banque-exercices && viewItem == chapter",
 					"group": "inline"
 				},

@@ -134,46 +134,84 @@ function activate() {
 	console.log('The extension "prepa-workshop" is now active!');
 
 	// BANQUE EXERCICES COMMANDS //
-	vscode.commands.registerCommand('banque.copy', function (document) {
-		// Copy the document path to the clipboard
-		let editor = vscode.window.activeTextEditor;
-		if (editor) {
-			// let document = editor.document;
-			let position = editor.selection.active;
-			// get name of file opened in editor
-			const fileName = path.basename(editor.document.fileName);
-			// if TD in fileName
-			if (fileName.includes('TD') || fileName.includes('DS') || fileName.includes('DM')) {
-				editor.edit(editBuilder => {
-					editBuilder.insert(position, '\\Ex{' + document.label.replace(/"/g, '') + '}\n');
-				});
-			} else {
-				if (fileName.includes('Colle')) {			
-					editor.edit(editBuilder => {
-						editBuilder.insert(position, document.label.replace(/"/g, ''));
-					});
-				} else {
-					editor.edit(editBuilder => {
-						editBuilder.insert(position, document.label.replace(/"/g, ''));
-					});
-				}
-			}
-		}
-		}
-	)
+	// vscode.commands.registerCommand('banque.copy', function (document) {
+	// 	// Copy the document path to the clipboard
+	// 	let editor = vscode.window.activeTextEditor;
+	// 	if (editor) {
+	// 		// let document = editor.document;
+	// 		let position = editor.selection.active;
+	// 		// get name of file opened in editor
+	// 		const fileName = path.basename(editor.document.fileName);
+	// 		// if TD in fileName
+	// 		if (fileName.includes('TD') || fileName.includes('DS') || fileName.includes('DM')) {
+	// 			editor.edit(editBuilder => {
+	// 				editBuilder.insert(position, '\\Ex{' + document.label.replace(/"/g, '') + '}\n');
+	// 			});
+	// 		} else {
+	// 			if (fileName.includes('Colle')) {			
+	// 				editor.edit(editBuilder => {
+	// 					editBuilder.insert(position, document.label.replace(/"/g, ''));
+	// 				});
+	// 			} else {
+	// 				editor.edit(editBuilder => {
+	// 					editBuilder.insert(position, document.label.replace(/"/g, ''));
+	// 				});
+	// 			}
+	// 		}
+	// 	}
+	// 	}
+	// )
 
 	// FUNCTIONS OF VIEW - ITEM - THEME //
 	// copy the latex file and use it as a source in an exercise latex document (TD, ...)
-	vscode.commands.registerCommand('banque.source', function (document) {
+	// vscode.commands.registerCommand('banque.source', function (document) {
+	// 	// open the latex document in vscode
+	// 	let editor = vscode.window.activeTextEditor;
+	// 	if (editor) {
+	// 		// let document = editor.document;
+	// 		let position = editor.selection.active;
+	// 		editor.edit(editBuilder => {
+	// 			editBuilder.insert(position, '\\Source{' + path.basename(document.filePath) + '}\n');
+	// 		});
+	// 	}
+	// })
+
+	// add exercise in current latex chapter
+	vscode.commands.registerCommand('banque.ajout-exercice', function (document) {
+		vscode.window.showInformationMessage('Ajout d\'un exercice dans le chapitre ${document.label}');
 		// open the latex document in vscode
-		let editor = vscode.window.activeTextEditor;
-		if (editor) {
-			// let document = editor.document;
-			let position = editor.selection.active;
-			editor.edit(editBuilder => {
-				editBuilder.insert(position, '\\Source{' + path.basename(document.filePath) + '}\n');
-			});
-		}
+		vscode.commands.executeCommand('vscode.open', vscode.Uri.file(document.filePath), { viewColumn: vscode.ViewColumn.One }).then(() => {
+			// get the active text editor
+			let editor = vscode.window.activeTextEditor;
+			if (editor) {
+
+				// name of exercise environment
+				let exoenvi = 'exo';
+
+				// latex lines with exercise environment
+				const exo = `%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\\begin{${exoenvi}}[1][TD]{nom-exercice}\nÉnoncé\n\\begin{questions}\n\t\\item Première question.\n\t\\item Deuxième question.\n\\end{questions}\n\\end{${exoenvi}}\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n`;
+				vscode.window.showInformationMessage(exo);
+
+				// write exo at the very beginning of the file
+				editor.edit(editBuilder => {
+					editBuilder.insert(new vscode.Position(0, 0), exo);
+
+					// first occurrence of string to search in the document
+					var searchString = '{nom-exercice}';
+					let document = editor.document;
+					var text = document.getText();
+					var position = text.indexOf(searchString);
+					var startPosition = document.positionAt(position);
+					var endPosition = document.positionAt(position + searchString.length);
+					
+					// select the range and reveal it in the editor
+					var range = new vscode.Range(startPosition, endPosition);
+					editor.selection = new vscode.Selection(range.start, range.end);
+					editor.revealRange(range, vscode.TextEditorRevealType.AtTop);
+				});
+			
+			}
+		});
 	})
 
 	// open the latex file containing exercises in vscode
