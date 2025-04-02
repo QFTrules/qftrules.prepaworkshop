@@ -69,7 +69,7 @@ Cette vue arborescente correspond à une architecture réelle du dossier recueil
 
 Chaque exercice possède plusieurs caractéristiques, représentées par des données visuelles différentes. Ainsi l'exercice cité ci-dessus apparaît dans la vue arborescente comme :
 
-  > <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file_type_python.pmg" alt="Type" width="20"> Résolution numérique de la diffusion thermique ★★★
+  > <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file_type_python.png" alt="Type" width="20"> Résolution numérique de la diffusion thermique ★★★
 
 
 Ces données, listées de gauche à droite, sont les suivantes.
