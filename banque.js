@@ -6,6 +6,18 @@ const path = require('path');
 const TreeItem = require('./treeItem');
 // ---------------------------------- //
 
+function normalizeExcludedThemes(rawExclude) {
+	const values = Array.isArray(rawExclude)
+		? rawExclude
+		: (typeof rawExclude === 'string' && rawExclude.trim() !== '' ? [rawExclude] : []);
+
+	return new Set(values
+		.map(value => value.replace(/\\/g, '/').replace(/\/+$/, ''))
+		.map(value => path.basename(value))
+		.filter(Boolean)
+		.map(value => value.toLowerCase()));
+}
+
 function generateTreeItems(collapsedState = undefined) {
 
 	// absolute path to the recueil directory
@@ -17,7 +29,8 @@ function generateTreeItems(collapsedState = undefined) {
 	// list all folders in the recueil directory and remove the ones excluded
 	var themes_list = fs.readdirSync(BanquePath).filter(file => fs.statSync(path.join(BanquePath, file)).isDirectory());
 	const exclude = vscode.workspace.getConfiguration('banque').get('exclude');
-	themes_list = themes_list.filter(theme => !exclude.includes(theme));
+	const excludedThemes = normalizeExcludedThemes(exclude);
+	themes_list = themes_list.filter(theme => !excludedThemes.has(theme.toLowerCase()));
 
 	// return the themes in the tree view
 	return themes_list.map(function (theme) {
