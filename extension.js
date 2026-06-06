@@ -160,6 +160,7 @@ function activate() {
 	console.log('The extension "prepa-workshop" is now active!');
 	runtimeExerciceStyPath = update_graphics_path();
 	const banqueProvider = new BanqueExoShow();
+	const banqueTreeView = vscode.window.createTreeView('banque-exercices', { treeDataProvider: banqueProvider });
 
 	// BANQUE EXERCICES COMMANDS //
 	// vscode.commands.registerCommand('banque.copy', function (document) {
@@ -435,14 +436,12 @@ function activate() {
 		// hihglight the exercise in the editor
 		vscode.commands.executeCommand('extension.selectCurlyBrackets', {label: exo});
 
-		const banque_exercices = new BanqueExoShow();
-		const TreeView = vscode.window.createTreeView('banque-exercices', { treeDataProvider: banque_exercices });
-		const item = banque_exercices.getTreeItemByLabel(folderName,fileName,exo);
+		const item = banqueProvider.getTreeItemByLabel(folderName,fileName,exo);
 		if (!item) {
 			vscode.window.showErrorMessage(`Exercice « ${exo} » introuvable dans la banque.`);
 			return;
 		}
-		TreeView.reveal(item, {focus: true, select: true, expand: true});
+		banqueTreeView.reveal(item, {focus: true, select: true, expand: true});
 	});
 
 	// COMMANDS AT LAUNCH //
