@@ -103,8 +103,16 @@ class BanqueExoShow {
 
 	// constructor
     constructor(collapsedState = undefined) {
+		this.collapsedState = collapsedState;
+		this._onDidChangeTreeData = new vscode.EventEmitter();
+		this.onDidChangeTreeData = this._onDidChangeTreeData.event;
 		this.data = generateTreeItems(collapsedState);
     }
+
+	refresh() {
+		this.data = generateTreeItems(this.collapsedState);
+		this._onDidChangeTreeData.fire(undefined);
+	}
 
 	// define here the command to call when clicking on the tree items
 	getTreeItem(element) {

@@ -144,6 +144,7 @@ function update_graphics_path() {
 function activate() {
 	console.log('The extension "prepa-workshop" is now active!');
 	runtimeExerciceStyPath = update_graphics_path();
+	const banqueProvider = new BanqueExoShow();
 
 	// BANQUE EXERCICES COMMANDS //
 	// vscode.commands.registerCommand('banque.copy', function (document) {
@@ -237,7 +238,7 @@ function activate() {
 	vscode.commands.registerCommand('banque.refresh', () => {
 		// save current files opened in editor, then register banque d'exercices tree view
 		vscode.commands.executeCommand('workbench.action.files.saveAll').then(() => {
-		vscode.window.registerTreeDataProvider('banque-exercices', new BanqueExoShow());
+			banqueProvider.refresh();
 		});
 	});
 
@@ -415,7 +416,7 @@ function activate() {
 	});
 
 	// COMMANDS AT LAUNCH //
-	vscode.window.registerTreeDataProvider('banque-exercices', new BanqueExoShow())
+	vscode.window.registerTreeDataProvider('banque-exercices', banqueProvider)
 
 
 }
