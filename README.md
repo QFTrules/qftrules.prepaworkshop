@@ -106,10 +106,10 @@ L’extension Prépa Workshop utilise plusieurs paramètres de configurations. L
 Voici la liste de raccourcis clavier des commandes de l’extension, toutes modifiables par l’utilisateur depuis la palette de commandes de VSCode.
  - ```workbench.view.extension.package-explorer```
    - Action : ouvre la vue arborescente de l’extension. Équivaut à cliquer sur l’icône de l’extension  <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/graduation-cap-solid_dark.png" alt="" width="20"> dans la barre des tâches latérale à gauche de l’éditeur.
-   - Clé par défaut : ```ctrl+shift+p```
+  - Clé par défaut : ```ctrl+k ctrl+p```
 - ```banque.compile```
    - Action : compile l’exercice, soit depuis la vue arborescente en cliquant sur l’icône <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file-pdf-solid_dark.png" alt="" width="20">, soit depuis l’éditeur, auquel cas l’exercice est repéré par la position courante du curseur.
-   - clé par défaut : ```alt+f1```
+  - Clé par défaut : ```ctrl+k ctrl+x```
 
 
 # LaTeX

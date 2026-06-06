@@ -38,12 +38,12 @@
 		"keybindings": [
 			{
 				"command": "workbench.view.extension.package-explorer",
-				"key": "ctrl+shift+p",
+				"key": "ctrl+k ctrl+p",
 				"when": "true"
 			},
 			{
 				"command": "banque.compile",
-				"key": "alt+f1",
+				"key": "ctrl+k ctrl+x",
 				"when": "editorTextFocus && editorLangId == latex"
 			}
 		],
