@@ -271,6 +271,30 @@ function activate() {
 	runtimeExerciceStyPath = update_graphics_path();
 	const banqueProvider = new BanqueExoShow();
 	const banqueTreeView = vscode.window.createTreeView('banque-exercices', { treeDataProvider: banqueProvider });
+	const expandedNodes = new Map();
+
+	function nodeKey(element) {
+		const contextValue = element && element.contextValue ? String(element.contextValue) : '';
+		const filePathPart = element && element.filePath ? String(element.filePath) : '';
+		const labelPart = element && element.label ? String(element.label) : '';
+		return `${contextValue}|${filePathPart}|${labelPart}`;
+	}
+
+	function nodeDepth(element) {
+		const filePathValue = element && element.filePath ? String(element.filePath) : '';
+		const normalizedPath = filePathValue === '' ? '' : path.normalize(filePathValue);
+		const pathDepth = normalizedPath === '' ? 0 : normalizedPath.split(path.sep).filter(Boolean).length;
+		const levelBonus = element && element.contextValue === 'folder' ? 0 : 1;
+		return pathDepth + levelBonus;
+	}
+
+	banqueTreeView.onDidExpandElement(event => {
+		expandedNodes.set(nodeKey(event.element), event.element);
+	});
+
+	banqueTreeView.onDidCollapseElement(event => {
+		expandedNodes.delete(nodeKey(event.element));
+	});
 
 	function insertExerciseTemplate(document) {
 		if (!document || !document.filePath) {
@@ -376,9 +400,43 @@ function activate() {
 		});
 	});
 
-	// collapse all items in the tree view
-	vscode.commands.registerCommand('banque.collapse', () => {
-		vscode.commands.executeCommand("workbench.actions.treeView.banque-exercices.collapseAll");
+	// Collapse only the deepest currently opened level, without opening closed nodes.
+	vscode.commands.registerCommand('banque.collapse', async () => {
+		const openedNodes = Array.from(expandedNodes.values());
+
+		const normalizePath = value => path.normalize(String(value || ''));
+		const isDescendant = (ancestorPath, childPath) => {
+			if (!ancestorPath || !childPath || ancestorPath === childPath) {
+				return false;
+			}
+			const ancestorWithSep = ancestorPath.endsWith(path.sep) ? ancestorPath : `${ancestorPath}${path.sep}`;
+			return childPath.startsWith(ancestorWithSep);
+		};
+
+		const openedInfos = openedNodes.map(node => ({
+			node,
+			path: normalizePath(node.filePath),
+			depth: nodeDepth(node),
+		}));
+
+		const nodesToKeepExpanded = openedInfos
+			.filter(current => openedInfos.some(other => isDescendant(current.path, other.path)))
+			.sort((a, b) => a.depth - b.depth)
+			.map(entry => entry.node);
+
+		await vscode.commands.executeCommand('workbench.actions.treeView.banque-exercices.collapseAll');
+
+		if (nodesToKeepExpanded.length === 0) {
+			return;
+		}
+
+		for (const node of nodesToKeepExpanded) {
+			try {
+				await banqueTreeView.reveal(node, { focus: false, select: false, expand: true });
+			} catch (error) {
+				// Ignore stale nodes (e.g. tree changed since snapshot).
+			}
+		}
 	});
 
 	// FUNCTIONS OF VIEW - ITEM - EXERCICE //
