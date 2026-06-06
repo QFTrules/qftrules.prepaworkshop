@@ -42,13 +42,69 @@ function safeReadFile(targetPath) {
 	}
 }
 
-function generateTreeItems(collapsedState = undefined) {
-
-	// absolute path to the recueil directory
+function getBanquePath() {
 	const BanquePath = resolveBanquePath(vscode.workspace.getConfiguration('banque').get('path'));
 
 	if (!fs.existsSync(BanquePath) || !fs.statSync(BanquePath).isDirectory()) {
 		vscode.window.showErrorMessage('Chemin d`accès banque.path invalide.');
+		return undefined;
+	}
+
+	return BanquePath;
+}
+
+function buildExerciseItem(exoLine, filePath, theme, basename) {
+	var start = exoLine.lastIndexOf('{') + 1;
+	var end = exoLine.lastIndexOf('}');
+	const exoName = exoLine.substring(start, end);
+	start = exoLine.lastIndexOf('[') + 1;
+	end = exoLine.lastIndexOf(']');
+	const typeExo = exoLine.substring(start, end);
+	start = exoLine.indexOf('[') + 1;
+	end = exoLine.indexOf(']');
+	const difficulty = exoLine.substring(start, end);
+
+	return new TreeItem(exoName,
+		undefined,
+		filePath,
+		'file',
+		undefined,
+		typeExo,
+		difficulty,
+		basename,
+		theme.toUpperCase());
+}
+
+function generateExerciseItems(chapterItem) {
+	const basename = path.parse(chapterItem.filePath).name;
+	return safeReadFile(chapterItem.filePath)
+		.split('\n')
+		.filter(line => line.includes('\\begin{exo}'))
+		.map(exoLine => buildExerciseItem(exoLine, chapterItem.filePath, chapterItem.theme, basename));
+}
+
+function generateChapterItems(themeItem, collapsedState = undefined) {
+	return safeReadDir(themeItem.filePath)
+		.filter(entry => entry.isFile() && entry.name.endsWith('.tex'))
+		.map(entry => path.join(themeItem.filePath, entry.name))
+		.map(filePath => {
+			const basename = path.parse(filePath).name;
+
+			return new TreeItem(basename,
+				undefined,
+				filePath,
+				'chapter',
+				collapsedState,
+				undefined,
+				undefined,
+				basename,
+				themeItem.theme);
+		});
+}
+
+function generateTreeItems(collapsedState = undefined) {
+	const BanquePath = getBanquePath();
+	if (!BanquePath) {
 		return [];
 	}
 
@@ -62,53 +118,9 @@ function generateTreeItems(collapsedState = undefined) {
 
 	// return the themes in the tree view
 	return themes_list.map(function (theme) {
-		// get the list of absolute paths to latex files for the theme 
-		const latex_files = safeReadDir(path.join(BanquePath, theme))
-			.filter(entry => entry.isFile() && entry.name.endsWith('.tex'))
-			.map(entry => path.join(BanquePath, theme, entry.name));
-
-		// return tree items of each theme
 		return new TreeItem(theme.toUpperCase(), // theme level
-			latex_files.map(function (filePath) {
-				// get the list of exercises in the latex file
-				const exercices = safeReadFile(filePath).split('\n').filter(line => line.includes('\\begin{exo}'));
-				const basename = path.parse(filePath).name
-
-				return new TreeItem(basename, // chapter level
-					exercices.map(function (exo) {
-						// get exercise name
-						var start = exo.lastIndexOf('{') + 1;
-						var end = exo.lastIndexOf('}');
-						const exoName = exo.substring(start, end);
-						// get exercise type
-						var start = exo.lastIndexOf('[') + 1;
-						var end = exo.lastIndexOf(']');
-						const typeExo = exo.substring(start, end);
-						// get exercise difficulty
-						var start = exo.indexOf('[') + 1;
-						var end = exo.indexOf(']');
-						const difficulty = exo.substring(start, end);
-						// return exercise tree item
-						return new TreeItem(exoName,      			// label
-											undefined, 				// children
-											filePath,  				// filePath
-											'file',    				// contextValue
-											undefined,				// collapsed
-											typeExo,   				// typeExo
-											difficulty,			  	// difficulty
-											basename,				// chapter
-											theme.toUpperCase()); 	// theme
-					}),					// children
-					filePath, 			// filePath
-					'chapter', 			// contextValue
-					collapsedState,		// collapsed
-					undefined, 			// typeExo
-					undefined,			// difficulty
-					basename, 			// chapter
-					theme.toUpperCase() // theme
-				);
-			}),					// children
-			undefined, 			// filePath
+			undefined,
+			path.join(BanquePath, theme),
 			'folder',  			// contextValue
 			collapsedState, 	// collapsed
 			undefined, 			// typeExo
@@ -163,6 +175,12 @@ class BanqueExoShow {
         if (element === undefined) {
             return this.data;
         }
+		if (element.contextValue === 'folder') {
+			return generateChapterItems(element, this.collapsedState);
+		}
+		if (element.contextValue === 'chapter') {
+			return generateExerciseItems(element);
+		}
         return element.children;
     };
 
@@ -196,19 +214,13 @@ class BanqueExoShow {
 		for (let i = 0; i < treeItems.length; i++) {
 			if (folderName === 'undefined' || treeItems[i].label.trim() === folderName.toUpperCase().trim())  {
 				var node1 = treeItems[i];
-				// if (folderName === label) {
-				// 	return node1;
-				// }
-				for (let j = 0; j < node1.children.length; j++) {
-					if (node1.children[j].label === filename) {
-						var node2 = node1.children[j];
-						// if (filename === label) {
-						// 	return node2;
-						// }
-						for (let k = 0; k < node2.children.length; k++) {
-							if (node2.children[k].label === label) {
-								// vscode.window.showInformationMessage(treeItems[i].children[j].children[k].label);
-								return node2.children[k];
+				const chapters = generateChapterItems(node1, this.collapsedState);
+				for (let j = 0; j < chapters.length; j++) {
+					if (chapters[j].label === filename) {
+						const exercises = generateExerciseItems(chapters[j]);
+						for (let k = 0; k < exercises.length; k++) {
+							if (exercises[k].label === label) {
+								return exercises[k];
 							}
 						}
 					}
