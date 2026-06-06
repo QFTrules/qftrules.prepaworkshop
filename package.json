@@ -60,7 +60,17 @@
 				"title": "Ouvrir exercice"
 			},
 			{
+				"command": "banque.folder",
+				"title": "Ouvrir dossier",
+				"icon": "$(folder-opened)"
+			},
+			{
 				"command": "banque.ajout-exercice",
+				"title": "Ajouter exercice",
+				"icon": "$(add)"
+			},
+			{
+				"command": "banque.addexo",
 				"title": "Ajouter exercice",
 				"icon": "$(add)"
 			},
@@ -100,9 +110,14 @@
 					"group": "inline@-1"
 				},
 				{
-					"command": "banque.ajout-exercice",
+					"command": "banque.folder",
+					"when": "view == banque-exercices && viewItem == folder",
+					"group": "inline@-1"
+				},
+				{
+					"command": "banque.addexo",
 					"when": "view == banque-exercices && viewItem == chapter",
-					"group": "inline"
+					"group": "inline@-2"
 				},
 				{
 					"command": "banque.open",
