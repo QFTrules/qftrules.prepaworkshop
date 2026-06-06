@@ -17,11 +17,11 @@ function resolveBanquePath(rawPath) {
 	return path.resolve(rawPath);
 }
 
-const BanquePath = resolveBanquePath(vscode.workspace.getConfiguration('banque').get('path'));
-// check if path is valid
-if (!fs.existsSync(BanquePath)) {
-	vscode.window.showErrorMessage('Chemin d`accès banque.path invalide.');
+function isValidBanquePath(targetPath) {
+	return fs.existsSync(targetPath) && fs.statSync(targetPath).isDirectory();
 }
+
+const BanquePath = resolveBanquePath(vscode.workspace.getConfiguration('banque').get('path'));
 
 // // ---------------------------------- //
 // // GLOBAL STORAGE PATH //
@@ -119,6 +119,11 @@ function insertLatexMagic(editor, rootFile) {
 function update_graphics_path() {
 	const exercice_sty = path.join(templatePath, 'exercice.sty');
 	const generated_exercice_sty = path.join(tmpPath, 'exercice.generated.sty');
+
+	if (!isValidBanquePath(BanquePath)) {
+		vscode.window.showWarningMessage('Chemin d`accès banque.path invalide. Utilisation du template exercice.sty par défaut.');
+		return exercice_sty;
+	}
 
 	if (!fs.existsSync(tmpPath)) {
 		fs.mkdirSync(tmpPath, { recursive: true });
