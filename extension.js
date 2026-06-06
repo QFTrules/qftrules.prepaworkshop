@@ -63,6 +63,113 @@ function toTexPath(filePath) {
 	return filePath.replace(/\\/g, '/');
 }
 
+function hashString(value) {
+	let hash = 0;
+	for (let index = 0; index < value.length; index++) {
+		hash = ((hash << 5) - hash) + value.charCodeAt(index);
+		hash |= 0;
+	}
+	return Math.abs(hash).toString(16);
+}
+
+function buildTempExerciseBasePath(filePath, exo) {
+	const sourceBaseName = path.parse(filePath).name;
+	const safeExoName = exo.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40) || 'exercise';
+	const suffix = hashString(`${filePath}::${exo}`);
+	return path.join(tmpPath, `Exercice_${sourceBaseName}_${safeExoName}_${suffix}`);
+}
+
+function resolveLatexOutDir(rootFilePath) {
+	const rootFileUri = vscode.Uri.file(rootFilePath);
+	const rawOutDir = vscode.workspace.getConfiguration('latex-workshop', rootFileUri).get('latex.outDir');
+	const rootDir = path.dirname(rootFilePath);
+	const workspaceFolder = vscode.workspace.getWorkspaceFolder(rootFileUri);
+	const workspaceFolderPath = workspaceFolder ? workspaceFolder.uri.fsPath : rootDir;
+	const parsedRootFile = path.parse(rootFilePath);
+
+	if (typeof rawOutDir !== 'string' || rawOutDir.trim() === '') {
+		return rootDir;
+	}
+
+	const resolvedOutDir = rawOutDir
+		.replace(/%DIR%/g, rootDir)
+		.replace(/%WORKSPACE_FOLDER%/g, workspaceFolderPath)
+		.replace(/%DOC%/g, parsedRootFile.name)
+		.replace(/%DOCFILE%/g, parsedRootFile.base)
+		.replace(/%TMPDIR%/g, tmpPath);
+
+	return path.isAbsolute(resolvedOutDir)
+		? resolvedOutDir
+		: path.resolve(rootDir, resolvedOutDir);
+}
+
+function delay(milliseconds) {
+	return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+async function waitForPdf(rootFilePath, attempts = 10, delayMs = 150) {
+	const parsedRootFile = path.parse(rootFilePath);
+	const candidatePaths = [
+		path.join(path.dirname(rootFilePath), `${parsedRootFile.name}.pdf`),
+		path.join(resolveLatexOutDir(rootFilePath), `${parsedRootFile.name}.pdf`),
+	];
+
+	for (let attempt = 0; attempt < attempts; attempt++) {
+		for (const candidatePath of candidatePaths) {
+			if (fs.existsSync(candidatePath)) {
+				return candidatePath;
+			}
+		}
+
+		await delay(delayMs);
+	}
+
+	return undefined;
+}
+
+async function openPdfInSecondColumn(pdfPath) {
+	const pdfUri = vscode.Uri.file(pdfPath);
+	const secondGroup = vscode.window.tabGroups.all.find(group => group.viewColumn === vscode.ViewColumn.Two);
+
+	if (secondGroup) {
+		const existingPdfTabs = secondGroup.tabs.filter(tab => tab.input && tab.input.uri && tab.input.uri.fsPath.startsWith(tmpPath) && tab.input.uri.fsPath.endsWith('.pdf'));
+		if (existingPdfTabs.length > 0) {
+			await vscode.window.tabGroups.close(existingPdfTabs, true);
+		}
+	}
+
+	return vscode.commands.executeCommand('vscode.open', pdfUri, {
+		viewColumn: vscode.ViewColumn.Two,
+		preview: false,
+		preserveFocus: false,
+	});
+}
+
+async function ensureBuildEditor(rootFilePath) {
+	if (vscode.window.activeTextEditor) {
+		return undefined;
+	}
+
+	const document = await vscode.workspace.openTextDocument(vscode.Uri.file(rootFilePath));
+	await vscode.window.showTextDocument(document, {
+		viewColumn: vscode.ViewColumn.One,
+		preview: true,
+		preserveFocus: false,
+	});
+
+	return rootFilePath;
+}
+
+async function closeTabByPath(filePath) {
+	for (const group of vscode.window.tabGroups.all) {
+		const tab = group.tabs.find(candidate => candidate.input && candidate.input.uri && candidate.input.uri.fsPath === filePath);
+		if (tab) {
+			await vscode.window.tabGroups.close(tab, true);
+			return;
+		}
+	}
+}
+
 // find all subdirectories, WHATEVER THE DEPTH, within directory basePath that are called dirName
 function findDirectories(basePath, dirName) {
     let results = [];
@@ -135,7 +242,10 @@ function update_graphics_path() {
 	try {
 		const data = fs.readFileSync(exercice_sty, 'utf8');
 		const cleanedData = data.replace(/\n% Added by qft-rules.prepaworkshop on start-up\n\\graphicspath\{\{[\s\S]*?\}\}/g, '');
-		const normalizedDirectories = directories.map(directory => toTexPath(directory));
+		const normalizedDirectories = directories.map(directory => {
+			const normalizedDirectory = toTexPath(directory);
+			return normalizedDirectory.endsWith('/') ? normalizedDirectory : `${normalizedDirectory}/`;
+		});
 		const graphicsPathLine = normalizedDirectories.length > 0
 			? `\n% Added by qft-rules.prepaworkshop on start-up\n\\graphicspath{{${normalizedDirectories.join('}{')}}}`
 			: '';
@@ -271,7 +381,7 @@ function activate() {
 			return;
 		}
 
-		vscode.commands.executeCommand('vscode.open', vscode.Uri.file(doc.filePath), { viewColumn: vscode.ViewColumn.One }).then(() => {
+		return vscode.commands.executeCommand('vscode.open', vscode.Uri.file(doc.filePath), { viewColumn: vscode.ViewColumn.One }).then(() => {
 			// Get the active text editor and string to search
 			var editor = vscode.window.activeTextEditor;
 			if (!editor) {
@@ -311,7 +421,7 @@ function activate() {
 	
 	// FUNCTIONS OF VIEW - ITEM - EXERCICE INLINE //
 	// command to compile an exercise separately
-	vscode.commands.registerCommand('banque.compile', function (document) {
+	vscode.commands.registerCommand('banque.compile', async function (document) {
 		
 		let exoenvi = 'exo';
 		// string to search in the document
@@ -357,13 +467,15 @@ function activate() {
 				vscode.window.showErrorMessage('Impossible de compiler: informations exercice manquantes.');
 				return;
 			}
+			await vscode.commands.executeCommand('banque.fetch', document);
+			editor = vscode.window.activeTextEditor;
 			var exo = document.label;
 			var FilePath = document.filePath;
 		}
 
 		// name of temporary latex exercise file
-		const exercice_name = 'Exercice'
-		const exercice = __dirname + `/tmp/${exercice_name}`;
+		const exercice = buildTempExerciseBasePath(FilePath, exo);
+		const exerciceTexPath = exercice + '.tex';
 		if (!fs.existsSync(tmpPath)) {
 			fs.mkdirSync(tmpPath, { recursive: true });
 		}
@@ -374,19 +486,27 @@ function activate() {
 		}
 		// create the exercise latex file
 		const template = `\\input{${toTexPath(runtimeExerciceStyPath)}}\n\\Corrige\n\\begin{document}\n\\Source{${toTexPath(FilePath)}}\n\\Exercice{${exo}}\n\\end{document}`;
-		fs.writeFileSync(exercice + '.tex', template);
+		fs.writeFileSync(exerciceTexPath, template);
 		// compile and open the exercise
-		vscode.commands.executeCommand('latex-workshop.build', {rootFile:exercice + '.tex', recipe:'pdflatex'}).then(() => {
-			const pdfPath = exercice + '.pdf';
+		const temporaryEditorPath = await ensureBuildEditor(exerciceTexPath);
 
-			if (!fs.existsSync(pdfPath)) {
+		vscode.commands.executeCommand('latex-workshop.build', false, exerciceTexPath, 'latex', 'pdflatex').then(async () => {
+			const pdfPath = await waitForPdf(exerciceTexPath);
+
+			if (!pdfPath) {
+				if (temporaryEditorPath) {
+					await closeTabByPath(temporaryEditorPath);
+				}
 				vscode.window.showWarningMessage(`Compilation terminée, mais le PDF de l'exercice « ${exo} » est introuvable.`);
 				return;
 			}
 
 			// message to show that the exercise has been compiled
 			vscode.window.showInformationMessage(`Exercice « ${exo} » compilé avec succès.`);
-			vscode.commands.executeCommand('vscode.open', vscode.Uri.file(pdfPath), { viewColumn: vscode.ViewColumn.Beside });
+			if (temporaryEditorPath) {
+				await closeTabByPath(temporaryEditorPath);
+			}
+			await openPdfInSecondColumn(pdfPath);
 		});
 		
 	});
