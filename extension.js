@@ -66,7 +66,13 @@ function toTexPath(filePath) {
 // find all subdirectories, WHATEVER THE DEPTH, within directory basePath that are called dirName
 function findDirectories(basePath, dirName) {
     let results = [];
-    const items = fs.readdirSync(basePath, { withFileTypes: true });
+	let items = [];
+
+	try {
+		items = fs.readdirSync(basePath, { withFileTypes: true });
+	} catch (error) {
+		return results;
+	}
 
     for (const item of items) {
         if (item.isDirectory()) {
