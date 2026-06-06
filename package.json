@@ -15,9 +15,6 @@
 	"categories": [
 		"Snippets"
 	],
-	"activationEvents": [
-		"onStartupFinished"
-	],
 	"main": "./extension.js",
 	"contributes": {
 		"snippets": [
