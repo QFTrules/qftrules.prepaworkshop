@@ -1,7 +1,6 @@
 // IMPORTS //
 var vscode = require('vscode');
 const fs = require('fs');
-const path = require('path');
 const BanqueExoShow = require('./banque');
 // ---------------------------------- //
 
@@ -237,10 +236,16 @@ function activate() {
 	// FUNCTIONS OF VIEW - ITEM - EXERCICE //
 	// fetch a string in a latex file, like exercise name of balise
 	vscode.commands.registerCommand('banque.fetch', function (doc) {
+		if (!doc || !doc.filePath || !doc.label) {
+			vscode.window.showErrorMessage('Impossible d\'ouvrir cet exercice: informations manquantes.');
+			return;
+		}
+
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.file(doc.filePath), { viewColumn: vscode.ViewColumn.One }).then(() => {
 			// Get the active text editor and string to search
 			var editor = vscode.window.activeTextEditor;
 			if (!editor) {
+				vscode.window.showErrorMessage('Aucun éditeur actif pour rechercher l\'exercice.');
 				return;
 			}
 
@@ -249,24 +254,28 @@ function activate() {
 			let document = editor.document;
 			var text = document.getText();
 			var position = text.indexOf(searchString);
-			var startPosition = document.positionAt(position);
-			var endPosition = document.positionAt(position + searchString.length);
-			
-			// check that the string \begin{exo} is also at the beginning of the line
-			var line = document.lineAt(startPosition.line).text;
-			while (!line.includes('{exo}')) {
-					// look for next occurrence of searchString
-					position = text.indexOf(searchString, position + 1);
-					startPosition = document.positionAt(position);
-					endPosition = document.positionAt(position + searchString.length);
-					range = new vscode.Range(startPosition, endPosition);
-					line = document.lineAt(startPosition.line).text;
+
+			if (position < 0) {
+				vscode.window.showErrorMessage(`Exercice « ${doc.label} » introuvable dans ce fichier.`);
+				return;
+			}
+
+			while (position >= 0) {
+				const startPosition = document.positionAt(position);
+				const endPosition = document.positionAt(position + searchString.length);
+				const line = document.lineAt(startPosition.line).text;
+
+				if (line.includes('{exo}')) {
+					const range = new vscode.Range(startPosition, endPosition);
+					editor.selection = new vscode.Selection(range.start, range.end);
+					editor.revealRange(range, vscode.TextEditorRevealType.AtTop);
+					return;
 				}
-				
-			// select the range and reveal it in the editor
-			var range = new vscode.Range(startPosition, endPosition);
-			editor.selection = new vscode.Selection(range.start, range.end);
-			editor.revealRange(range, vscode.TextEditorRevealType.AtTop);
+
+				position = text.indexOf(searchString, position + searchString.length);
+			}
+
+			vscode.window.showErrorMessage(`Exercice « ${doc.label} » trouvé, mais pas dans un environnement exo.`);
 		});
 	})
 	
@@ -281,6 +290,8 @@ function activate() {
 		// get the active text editor
 		let editor = vscode.window.activeTextEditor;
 		if (!editor) {
+			vscode.window.showErrorMessage('Aucun éditeur actif pour compiler l\'exercice.');
+			return;
 		}
 
 		// if command called from the editor
@@ -305,10 +316,18 @@ function activate() {
 			const start = lineText.indexOf('{', lineText.indexOf('{') + 1) + 1;
 			// get last } caracter in line in case {} characters are present in exo title
 			const end = lineText.lastIndexOf('}');
+			if (start <= 0 || end <= start) {
+				vscode.window.showErrorMessage('Format d\'en-tête exo invalide sur la ligne sélectionnée.');
+				return;
+			}
 			var exo = lineText.substring(start, end);
 			var FilePath = editor.document.fileName;
 		} else {// command called from the explorer context menu
 			vscode.commands.executeCommand('banque.fetch', document);
+			if (!document.filePath || !document.label) {
+				vscode.window.showErrorMessage('Impossible de compiler: informations exercice manquantes.');
+				return;
+			}
 			var exo = document.label;
 			var FilePath = document.filePath;
 		}
