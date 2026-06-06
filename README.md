@@ -69,20 +69,22 @@ Cette vue arborescente correspond à une architecture réelle du dossier recueil
 
 Chaque exercice possède plusieurs caractéristiques, représentées par des données visuelles différentes. Ainsi l'exercice cité ci-dessus apparaît dans la vue arborescente comme :
 
-  > <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file_type_python.png" alt="Type" width="20"> Résolution numérique de la diffusion thermique ★★★
+  > Résolution numérique de la diffusion thermique ★★★
 
 
 Ces données, listées de gauche à droite, sont les suivantes.
- - <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file_type_python.png" alt="Type" width="20"> : type d’exercice ;
+ - Icône VS Code : type d’exercice ;
  - Résolution numérique de la diffusion thermique : nom de l’exercice ;
  - ★★★ : difficulté de l’exercice (nombre d’étoiles illimitée).
 
 Le type d'exercices précise de quel nature ou à quel usage se destine l'exercice. Les types d'exercices disponibles sont : 
-- capacité numérique en python : <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file_type_python.png" alt="Type" width="20">
-- exercice de TD : <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/pencil_dark.png" alt="Type" width="20">
-- exercice de colle : <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/chalkboard_dark.png" alt="Type" width="20">
-- devoir ou partie d’un devoir : <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/paper_dark.png" alt="Type" width="20">
-- résolution de problème : <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/gear-solid_dark.png" alt="Type" width="20">
+- capacité numérique en python : icône `terminal`
+- exercice de TD ou appli : icône `edit`
+- exercice de colle : icône `comment-discussion`
+- résolution de problème : icône `lightbulb`
+- devoir ou partie d’un devoir : icône `file`
+- expérience ou exercice expérimental : icône `beaker`
+- autre type non reconnu : icône `blank`
 
 ## Programme de colle
 En cours...
@@ -108,7 +110,7 @@ Voici la liste de raccourcis clavier des commandes de l’extension, toutes modi
    - Action : ouvre la vue arborescente de l’extension. Équivaut à cliquer sur l’icône de l’extension  <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/graduation-cap-solid_dark.png" alt="" width="20"> dans la barre des tâches latérale à gauche de l’éditeur.
   - Clé par défaut : ```ctrl+k ctrl+p```
 - ```banque.compile```
-   - Action : compile l’exercice, soit depuis la vue arborescente en cliquant sur l’icône <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/file-pdf-solid_dark.png" alt="" width="20">, soit depuis l’éditeur, auquel cas l’exercice est repéré par la position courante du curseur.
+  - Action : compile l’exercice, soit depuis la vue arborescente en cliquant sur l’icône PDF, soit depuis l’éditeur, auquel cas l’exercice est repéré par la position courante du curseur.
   - Clé par défaut : ```ctrl+k ctrl+x```
 
 

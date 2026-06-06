@@ -53,43 +53,36 @@ var TreeItem = /** @class */ (function (_super) {
 			}
 			
 			if (typeof typeExo === 'string') {
+				const typeExoNormalized = typeExo.toLowerCase();
+				const typeExoAscii = typeExoNormalized.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+				const banqueIconColor = new vscode.ThemeColor('descriptionForeground');
 				// define context-specific icons for banque-exercices
 				if (_this.contextValue === 'file') {
-					if (typeExo.includes('python')) {
-						_this.iconPath = {
-							light: path.join(__dirname, 'images', 'file_type_python.svg'),
-							dark: path.join(__dirname, 'images', 'file_type_python.svg')
-						};
+					if (typeExoNormalized.includes('python')) {
+						_this.iconPath = new vscode.ThemeIcon('terminal', banqueIconColor);
 					} else {
-						if (typeExo.includes('TD') || typeExo.includes('appli')) {
-							_this.iconPath = {
-								light: path.join(__dirname, 'images', 'pencil_light.png'),
-								dark: path.join(__dirname, 'images', 'pencil_dark.png')
-							};
+						if (typeExoNormalized.includes('td') || typeExoNormalized.includes('appli')) {
+							_this.iconPath = new vscode.ThemeIcon('edit', banqueIconColor);
 						} else {
-							if (typeExo.includes('colle')) {
-								_this.iconPath = {
-									light: path.join(__dirname, 'images', 'chalkboard_light.png'),
-									dark: path.join(__dirname, 'images', 'chalkboard_dark.png')
-								};
+							if (typeExoNormalized.includes('colle')) {
+								_this.iconPath = new vscode.ThemeIcon('comment-discussion', banqueIconColor);
 							} else {
-								if (typeExo.includes('oral')) {
-									_this.iconPath = {
-										light: path.join(__dirname, 'images', 'gear-solid_light.png'),
-										dark: path.join(__dirname, 'images', 'gear-solid_dark.png')
-									};
+								if (typeExoAscii.includes('problem') || typeExoAscii.includes('probleme') || typeExoAscii.includes('resolution de probleme') || typeExoAscii.includes('resolution de probleme')) {
+									_this.iconPath = new vscode.ThemeIcon('lightbulb', banqueIconColor);
 								} else {
-									if (typeExo.includes('devoir')) {
-										_this.iconPath = {
-											light: path.join(__dirname, 'images', 'paper_light.png'),
-											dark: path.join(__dirname, 'images', 'paper_dark.png')
-										};
-									}
-									else {
+									if (typeExoNormalized.includes('devoir')) {
+										_this.iconPath = new vscode.ThemeIcon('file', banqueIconColor);
+									} else {
+										if (typeExoNormalized.includes('exp')) {
+											_this.iconPath = new vscode.ThemeIcon('beaker', banqueIconColor);
+										}
 									}
 								}
 							}
 						}
+					}
+					if (!_this.iconPath) {
+						_this.iconPath = new vscode.ThemeIcon('blank');
 					}
 				}
 			// define specific icon for programme-colle	
