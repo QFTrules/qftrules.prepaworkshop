@@ -26,6 +26,22 @@ function resolveBanquePath(rawPath) {
 	return path.resolve(rawPath);
 }
 
+function safeReadDir(targetPath) {
+	try {
+		return fs.readdirSync(targetPath, { withFileTypes: true });
+	} catch (error) {
+		return [];
+	}
+}
+
+function safeReadFile(targetPath) {
+	try {
+		return fs.readFileSync(targetPath, 'utf8');
+	} catch (error) {
+		return '';
+	}
+}
+
 function generateTreeItems(collapsedState = undefined) {
 
 	// absolute path to the recueil directory
@@ -37,7 +53,9 @@ function generateTreeItems(collapsedState = undefined) {
 	}
 
 	// list all folders in the recueil directory and remove the ones excluded
-	var themes_list = fs.readdirSync(BanquePath).filter(file => fs.statSync(path.join(BanquePath, file)).isDirectory());
+	var themes_list = safeReadDir(BanquePath)
+		.filter(entry => entry.isDirectory())
+		.map(entry => entry.name);
 	const exclude = vscode.workspace.getConfiguration('banque').get('exclude');
 	const excludedThemes = normalizeExcludedThemes(exclude);
 	themes_list = themes_list.filter(theme => !excludedThemes.has(theme.toLowerCase()));
@@ -45,15 +63,15 @@ function generateTreeItems(collapsedState = undefined) {
 	// return the themes in the tree view
 	return themes_list.map(function (theme) {
 		// get the list of absolute paths to latex files for the theme 
-		const latex_files = fs.readdirSync(path.join(BanquePath, theme))
-			.filter(file => file.endsWith('.tex'))
-			.map(file => path.join(BanquePath, theme, file));
+		const latex_files = safeReadDir(path.join(BanquePath, theme))
+			.filter(entry => entry.isFile() && entry.name.endsWith('.tex'))
+			.map(entry => path.join(BanquePath, theme, entry.name));
 
 		// return tree items of each theme
 		return new TreeItem(theme.toUpperCase(), // theme level
 			latex_files.map(function (filePath) {
 				// get the list of exercises in the latex file
-				const exercices = fs.readFileSync(filePath, 'utf8').split('\n').filter(line => line.includes('\\begin{exo}'));
+				const exercices = safeReadFile(filePath).split('\n').filter(line => line.includes('\\begin{exo}'));
 				const basename = path.parse(filePath).name
 
 				return new TreeItem(basename, // chapter level
