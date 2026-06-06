@@ -1,15 +1,18 @@
 // IMPORTS //
 var vscode = require('vscode');
 const fs = require('fs');
+const path = require('path');
 const BanqueExoShow = require('./banque');
 // ---------------------------------- //
 
 // PATHS //
-const templatePath = __dirname + '/templates'; 
+const templatePath = path.join(__dirname, 'templates');
+const tmpPath = path.join(__dirname, 'tmp');
+let runtimeExerciceStyPath = path.join(templatePath, 'exercice.sty');
 var BanquePath = vscode.workspace.getConfiguration('banque').get('path');
 // add absolute path of extension if value is default /recueil/
 if (BanquePath === '/recueil/') {
-	var BanquePath = __dirname + '/recueil/';
+	var BanquePath = path.join(__dirname, 'recueil') + '/';
 }
 // check if path is valid
 if (!fs.existsSync(BanquePath)) {
@@ -51,6 +54,10 @@ if (!fs.existsSync(BanquePath)) {
 
 
 // AUXILIARY FUNCTIONS //
+
+function toTexPath(filePath) {
+	return filePath.replace(/\\/g, '/');
+}
 
 // find all subdirectories, WHATEVER THE DEPTH, within directory basePath that are called dirName
 function findDirectories(basePath, dirName) {
@@ -100,25 +107,30 @@ function insertLatexMagic(editor, rootFile) {
 
 // update the graphics path in exercice.sty
 function update_graphics_path() {
+	const exercice_sty = path.join(templatePath, 'exercice.sty');
+	const generated_exercice_sty = path.join(tmpPath, 'exercice.generated.sty');
+
+	if (!fs.existsSync(tmpPath)) {
+		fs.mkdirSync(tmpPath, { recursive: true });
+	}
+
 	// find all subdirectories, WHATEVER THE DEPTH, within directory BanquePath that are called /Figures/
 	const directories = findDirectories(BanquePath, 'Figures');
-	// vscode.window.showInformationMessage(directories.toString());
 
-	// latex line to add (string)
-	const graphics_path = '\n% Added by qft-rules.prepaworkshop on start-up\n\\graphicspath{{' + directories.join('}{') + '}}';
-	// latex path to exercice.sty
-	const exercice_sty = templatePath + '/exercice.sty';
-	// read the file
-	const data = fs.readFileSync(exercice_sty, 'utf8');
-	// remove the command \\graphicspath if present
-	if (data.includes('\\graphicspath')) {
-		// remove the line
-		const newData = data.replace(/\n% Added by qft-rules.prepaworkshop on start-up\n\\graphicspath{.*}/, '');
-		// write the new data
-		fs.writeFileSync(exercice_sty, newData);
+	try {
+		const data = fs.readFileSync(exercice_sty, 'utf8');
+		const cleanedData = data.replace(/\n% Added by qft-rules.prepaworkshop on start-up\n\\graphicspath\{\{[\s\S]*?\}\}/g, '');
+		const normalizedDirectories = directories.map(directory => toTexPath(directory));
+		const graphicsPathLine = normalizedDirectories.length > 0
+			? `\n% Added by qft-rules.prepaworkshop on start-up\n\\graphicspath{{${normalizedDirectories.join('}{')}}}`
+			: '';
+
+		fs.writeFileSync(generated_exercice_sty, cleanedData + graphicsPathLine);
+		return generated_exercice_sty;
+	} catch (error) {
+		vscode.window.showWarningMessage('Impossible de générer exercice.sty dynamique, utilisation du template par défaut.');
+		return exercice_sty;
 	}
-	// add the line graphics_path
-	fs.appendFileSync(exercice_sty, graphics_path);
 }
 
 // ---------------------------------- //
@@ -131,6 +143,7 @@ function update_graphics_path() {
 
 function activate() {
 	console.log('The extension "prepa-workshop" is now active!');
+	runtimeExerciceStyPath = update_graphics_path();
 
 	// BANQUE EXERCICES COMMANDS //
 	// vscode.commands.registerCommand('banque.copy', function (document) {
@@ -338,7 +351,7 @@ function activate() {
 		// insert the TEX root line at the beginning of the file
 		insertLatexMagic(editor, exercice);
 		// create the exercise latex file
-		const template = `\\input{${templatePath}/exercice.sty}\n\\Corrige\n\\begin{document}\n\\Source{${FilePath}}\n\\Exercice{${exo}}\n\\end{document}`;
+		const template = `\\input{${toTexPath(runtimeExerciceStyPath)}}\n\\Corrige\n\\begin{document}\n\\Source{${FilePath}}\n\\Exercice{${exo}}\n\\end{document}`;
 		fs.writeFileSync(exercice + '.tex', template);
 		// compile and open the exercise
 		vscode.commands.executeCommand('latex-workshop.build', {rootFile:FilePath, recipe:'pdflatex'}).then(() => {
@@ -403,7 +416,6 @@ function activate() {
 
 	// COMMANDS AT LAUNCH //
 	vscode.window.registerTreeDataProvider('banque-exercices', new BanqueExoShow())
-	update_graphics_path();
 
 
 }
