@@ -18,12 +18,22 @@ function normalizeExcludedThemes(rawExclude) {
 		.map(value => value.toLowerCase()));
 }
 
+function resolveBanquePath(rawPath) {
+	if (!rawPath || rawPath === '/recueil/') {
+		return path.join(__dirname, 'recueil');
+	}
+
+	return path.resolve(rawPath);
+}
+
 function generateTreeItems(collapsedState = undefined) {
 
 	// absolute path to the recueil directory
-	var BanquePath = vscode.workspace.getConfiguration('banque').get('path');
-	if (BanquePath === '/recueil/') {
-		var BanquePath = __dirname + '/recueil/';
+	const BanquePath = resolveBanquePath(vscode.workspace.getConfiguration('banque').get('path'));
+
+	if (!fs.existsSync(BanquePath) || !fs.statSync(BanquePath).isDirectory()) {
+		vscode.window.showErrorMessage('Chemin d`accès banque.path invalide.');
+		return [];
 	}
 
 	// list all folders in the recueil directory and remove the ones excluded

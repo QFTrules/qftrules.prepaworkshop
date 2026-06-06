@@ -9,11 +9,15 @@ const BanqueExoShow = require('./banque');
 const templatePath = path.join(__dirname, 'templates');
 const tmpPath = path.join(__dirname, 'tmp');
 let runtimeExerciceStyPath = path.join(templatePath, 'exercice.sty');
-var BanquePath = vscode.workspace.getConfiguration('banque').get('path');
-// add absolute path of extension if value is default /recueil/
-if (BanquePath === '/recueil/') {
-	var BanquePath = path.join(__dirname, 'recueil') + '/';
+function resolveBanquePath(rawPath) {
+	if (!rawPath || rawPath === '/recueil/') {
+		return path.join(__dirname, 'recueil');
+	}
+
+	return path.resolve(rawPath);
 }
+
+const BanquePath = resolveBanquePath(vscode.workspace.getConfiguration('banque').get('path'));
 // check if path is valid
 if (!fs.existsSync(BanquePath)) {
 	vscode.window.showErrorMessage('Chemin d`accès banque.path invalide.');
@@ -66,7 +70,7 @@ function findDirectories(basePath, dirName) {
 
     for (const item of items) {
         if (item.isDirectory()) {
-			var fullPath = basePath + item.name + '/';
+			const fullPath = path.join(basePath, item.name);
 			if (item.name.includes(dirName)) {
 				results.push(fullPath);
 			}
