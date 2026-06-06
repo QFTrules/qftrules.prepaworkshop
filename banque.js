@@ -42,6 +42,14 @@ function safeReadFile(targetPath) {
 	}
 }
 
+function capitalizeLabel(label) {
+	if (typeof label !== 'string' || label.length === 0) {
+		return label;
+	}
+
+	return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 function getBanquePath() {
 	const BanquePath = resolveBanquePath(vscode.workspace.getConfiguration('banque').get('path'));
 
@@ -89,8 +97,9 @@ function generateChapterItems(themeItem, collapsedState = undefined) {
 		.map(entry => path.join(themeItem.filePath, entry.name))
 		.map(filePath => {
 			const basename = path.parse(filePath).name;
+			const displayName = capitalizeLabel(basename);
 
-			return new TreeItem(basename,
+			return new TreeItem(displayName,
 				undefined,
 				filePath,
 				'chapter',
@@ -216,7 +225,7 @@ class BanqueExoShow {
 				var node1 = treeItems[i];
 				const chapters = generateChapterItems(node1, this.collapsedState);
 				for (let j = 0; j < chapters.length; j++) {
-					if (chapters[j].label === filename) {
+					if (chapters[j].label === filename || chapters[j].chapter === filename) {
 						const exercises = generateExerciseItems(chapters[j]);
 						for (let k = 0; k < exercises.length; k++) {
 							if (exercises[k].label === label) {
