@@ -319,13 +319,13 @@ function activate() {
 
 		// get the active text editor
 		let editor = vscode.window.activeTextEditor;
-		if (!editor) {
-			vscode.window.showErrorMessage('Aucun éditeur actif pour compiler l\'exercice.');
-			return;
-		}
 
 		// if command called from the editor
 		if (document === undefined) {
+			if (!editor) {
+				vscode.window.showErrorMessage('Aucun éditeur actif pour compiler l\'exercice.');
+				return;
+			}
 
 			// declare the cursorPosition variable
 			const cursorPosition = editor.selection.active;
@@ -353,7 +353,6 @@ function activate() {
 			var exo = lineText.substring(start, end);
 			var FilePath = editor.document.fileName;
 		} else {// command called from the explorer context menu
-			vscode.commands.executeCommand('banque.fetch', document);
 			if (!document.filePath || !document.label) {
 				vscode.window.showErrorMessage('Impossible de compiler: informations exercice manquantes.');
 				return;
@@ -365,17 +364,29 @@ function activate() {
 		// name of temporary latex exercise file
 		const exercice_name = 'Exercice'
 		const exercice = __dirname + `/tmp/${exercice_name}`;
-		// insert the TEX root line at the beginning of the file
-		insertLatexMagic(editor, exercice);
+		if (!fs.existsSync(tmpPath)) {
+			fs.mkdirSync(tmpPath, { recursive: true });
+		}
+
+		// insert the TEX root line at the beginning of the file only when called from an editor
+		if (document === undefined && editor) {
+			insertLatexMagic(editor, exercice);
+		}
 		// create the exercise latex file
-		const template = `\\input{${toTexPath(runtimeExerciceStyPath)}}\n\\Corrige\n\\begin{document}\n\\Source{${FilePath}}\n\\Exercice{${exo}}\n\\end{document}`;
+		const template = `\\input{${toTexPath(runtimeExerciceStyPath)}}\n\\Corrige\n\\begin{document}\n\\Source{${toTexPath(FilePath)}}\n\\Exercice{${exo}}\n\\end{document}`;
 		fs.writeFileSync(exercice + '.tex', template);
 		// compile and open the exercise
-		vscode.commands.executeCommand('latex-workshop.build', {rootFile:FilePath, recipe:'pdflatex'}).then(() => {
+		vscode.commands.executeCommand('latex-workshop.build', {rootFile:exercice + '.tex', recipe:'pdflatex'}).then(() => {
+			const pdfPath = exercice + '.pdf';
+
+			if (!fs.existsSync(pdfPath)) {
+				vscode.window.showWarningMessage(`Compilation terminée, mais le PDF de l'exercice « ${exo} » est introuvable.`);
+				return;
+			}
+
 			// message to show that the exercise has been compiled
 			vscode.window.showInformationMessage(`Exercice « ${exo} » compilé avec succès.`);
-			// open tab
-			vscode.commands.executeCommand('latex-workshop.tab');
+			vscode.commands.executeCommand('vscode.open', vscode.Uri.file(pdfPath), { viewColumn: vscode.ViewColumn.Beside });
 		});
 		
 	});
