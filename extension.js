@@ -404,8 +404,16 @@ function activate() {
 			var exo = lineText.substring(startexo, endexo);
 			// fileName
 			const sourceIndex = editorText.indexOf('\\Source{');
+			if (sourceIndex < 0) {
+				vscode.window.showErrorMessage('Commande \\Source introuvable dans le document courant.');
+				return;
+			}
 			var start = sourceIndex + ('\\Source{').length;
 			var end = editorText.indexOf('.tex}', start);
+			if (end < 0) {
+				vscode.window.showErrorMessage('Format de \\Source invalide (suffixe .tex manquant).');
+				return;
+			}
 			var fileName = editorText.substring(start, end);
 			var folderName = 'undefined';
 		}
@@ -417,6 +425,10 @@ function activate() {
 			// fileName
 			var start = lineText.indexOf('[') +1;
 			var end = lineText.indexOf(']');
+			if (start <= 0 || end <= start) {
+				vscode.window.showErrorMessage('Format de la source dans \\Ex[] invalide.');
+				return;
+			}
 			var fileName = lineText.substring(start, end);
 			var folderName = 'undefined';
 		}
@@ -426,7 +438,10 @@ function activate() {
 		const banque_exercices = new BanqueExoShow();
 		const TreeView = vscode.window.createTreeView('banque-exercices', { treeDataProvider: banque_exercices });
 		const item = banque_exercices.getTreeItemByLabel(folderName,fileName,exo);
-		// vscode.window.showInformationMessage(item.label);
+		if (!item) {
+			vscode.window.showErrorMessage(`Exercice « ${exo} » introuvable dans la banque.`);
+			return;
+		}
 		TreeView.reveal(item, {focus: true, select: true, expand: true});
 	});
 
