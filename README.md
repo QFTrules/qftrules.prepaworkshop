@@ -2,12 +2,12 @@
 
 [![version](https://img.shields.io/visual-studio-marketplace/v/qft-rules.prepa-workshop)](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop)
 [![updated](https://img.shields.io/visual-studio-marketplace/last-updated/qft-rules.prepa-workshop)](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop)
-[![release](https://img.shields.io/visual-studio-marketplace/release-date/qft-rules.prepa-workshop)](https://vsmarketplacebadge.apphb.com/downloads-short/qft-rules.prepa-workshop.svg)
+[![release date](https://img.shields.io/visual-studio-marketplace/release-date/qft-rules.prepa-workshop)](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop)
 
-[![downloads](https://img.shields.io/visual-studio-marketplace/d/qft-rules.prepa-workshop)](https://vsmarketplacebadge.apphb.com/downloads-short/qft-rules.prepa-workshop.svg)
+[![downloads](https://img.shields.io/visual-studio-marketplace/d/qft-rules.prepa-workshop)](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop)
 [![installs](https://img.shields.io/visual-studio-marketplace/i/qft-rules.prepa-workshop)](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop)
 [![rating](https://img.shields.io/visual-studio-marketplace/r/qft-rules.prepa-workshop)](https://marketplace.visualstudio.com/items?itemName=qft-rules.prepa-workshop)
-[![License: CC BY 4.0](https://licensebuttons.net/l/by/4.0/80x15.png)](https://creativecommons.org/licenses/by/4.0/)
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
 [![TeX Live on Windows](https://github.com/James-Yu/LaTeX-Workshop/workflows/TeX%20Live%20on%20Windows/badge.svg)](https://github.com/James-Yu/LaTeX-Workshop/actions?query=workflow%3A%22TeX+Live+on+Windows%22)
 [![TeX Live on macOS](https://github.com/James-Yu/LaTeX-Workshop/workflows/TeX%20Live%20on%20macOS/badge.svg)](https://github.com/James-Yu/LaTeX-Workshop/actions?query=workflow%3A%22TeX+Live+on+macOS%22)
@@ -68,7 +68,6 @@ Cette vue arborescente correspond à une architecture réelle du dossier recueil
 ### Données affiliées aux exercices
 
 Chaque exercice possède plusieurs caractéristiques, représentées par des données visuelles différentes. Ainsi l'exercice cité ci-dessus apparaît dans la vue arborescente comme :
-
   > Résolution numérique de la diffusion thermique ★★★
 
 
@@ -78,13 +77,13 @@ Ces données, listées de gauche à droite, sont les suivantes.
  - ★★★ : difficulté de l’exercice (nombre d’étoiles illimitée).
 
 Le type d'exercices précise de quel nature ou à quel usage se destine l'exercice. Les types d'exercices disponibles sont : 
-- capacité numérique en python : icône `terminal`
-- exercice de TD ou appli : icône `edit`
-- exercice de colle : icône `comment-discussion`
-- résolution de problème : icône `lightbulb`
-- devoir ou partie d’un devoir : icône `file`
-- expérience ou exercice expérimental : icône `beaker`
-- autre type non reconnu : icône `blank`
+- capacité numérique en python : <img src="images/readme-icons/terminal.png" alt="terminal" width="16">
+- exercice de TD : <img src="images/readme-icons/edit.png" alt="edit" width="16">
+- exercice de colle : <img src="images/readme-icons/comment-discussion.png" alt="comment-discussion" width="16">
+- résolution de problème : <img src="images/readme-icons/lightbulb.png" alt="lightbulb" width="16">
+- devoir ou partie d’un devoir : <img src="images/readme-icons/file.png" alt="file" width="16">
+- expérience ou exercice expérimental : <img src="images/readme-icons/beaker.png" alt="beaker" width="16">
+- autre type non reconnu : <img src="images/readme-icons/blank.png" alt="blank" width="16">
 
 ## Programme de colle
 En cours...
@@ -108,7 +107,7 @@ L’extension Prépa Workshop utilise plusieurs paramètres de configurations. L
 Voici la liste de raccourcis clavier des commandes de l’extension, toutes modifiables par l’utilisateur depuis la palette de commandes de VSCode.
  - ```workbench.view.extension.package-explorer```
    - Action : ouvre la vue arborescente de l’extension. Équivaut à cliquer sur l’icône de l’extension  <img src="https://github.com/QFTrules/qftrules.prepaworkshop/blob/master/images/graduation-cap-solid_dark.png" alt="" width="20"> dans la barre des tâches latérale à gauche de l’éditeur.
-  - Clé par défaut : ```ctrl+p ctrl+p```
+  - Clé par défaut : ```ctrl+k ctrl+p```
 - ```banque.compile```
   - Action : compile l’exercice, soit depuis la vue arborescente en cliquant sur l’icône PDF, soit depuis l’éditeur, auquel cas l’exercice est repéré par la position courante du curseur.
   - Clé par défaut : ```ctrl+alt+f1```
