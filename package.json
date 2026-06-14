@@ -35,12 +35,12 @@
 		"keybindings": [
 			{
 				"command": "workbench.view.extension.package-explorer",
-				"key": "ctrl+k ctrl+p",
+				"key": "ctrl+p ctrl+p",
 				"when": "true"
 			},
 			{
 				"command": "banque.compile",
-				"key": "ctrl+k ctrl+x",
+				"key": "ctrl+alt+f1",
 				"when": "editorTextFocus && editorLangId == latex"
 			}
 		],
@@ -66,11 +66,6 @@
 			},
 			{
 				"command": "banque.ajout-exercice",
-				"title": "Ajouter exercice",
-				"icon": "$(add)"
-			},
-			{
-				"command": "banque.addexo",
 				"title": "Ajouter exercice",
 				"icon": "$(add)"
 			},
@@ -115,7 +110,7 @@
 					"group": "inline@-1"
 				},
 				{
-					"command": "banque.addexo",
+					"command": "banque.ajout-exercice",
 					"when": "view == banque-exercices && viewItem == chapter",
 					"group": "inline@-2"
 				},

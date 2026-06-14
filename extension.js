@@ -381,10 +381,6 @@ function activate() {
 		insertExerciseTemplate(document);
 	});
 
-	vscode.commands.registerCommand('banque.addexo', function (document) {
-		insertExerciseTemplate(document);
-	});
-
 	// open the latex file containing exercises in vscode
 	vscode.commands.registerCommand('banque.open', function (document) {
 		// open the latex document in vscode
