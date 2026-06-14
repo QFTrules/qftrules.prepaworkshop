@@ -131,10 +131,10 @@ En conséquence, certaines configurations de [Latex Workshop](https://marketplac
 Les macros LaTeX sont les suivantes.
  > Commandes : 
   - ```\solution```
-  - ```\Source```
+  <!-- - ```\Source``` -->
  > Environnements : 
   - ```mintedSolution```
-  - ```soluce```
+  <!-- - ```soluce``` -->
   - ```exo```
 
 ### Configurations LaTeX recommandées
