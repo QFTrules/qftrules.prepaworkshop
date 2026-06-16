@@ -196,24 +196,40 @@ class BanqueExoShow {
 
 	// get the parent of the tree item with the given label
 	getParent(element) {
-		const treeItems = this.data;
-		for (let i = 0; i < treeItems.length; i++) {
-			if (treeItems[i].label === element.label) {
+		if (!element || !element.contextValue) {
+			return undefined;
+		}
+
+		// Root folders have no parent in this tree.
+		if (element.contextValue === 'folder') {
+			return undefined;
+		}
+
+		const folders = this.data;
+		if (!Array.isArray(folders) || folders.length === 0) {
+			return undefined;
+		}
+
+		if (element.contextValue === 'chapter') {
+			const chapterTheme = (element.theme || '').toUpperCase();
+			return folders.find(folder => folder.label === chapterTheme) || undefined;
+		}
+
+		if (element.contextValue === 'file') {
+			const fileTheme = (element.theme || '').toUpperCase();
+			const parentFolder = folders.find(folder => folder.label === fileTheme);
+			if (!parentFolder) {
 				return undefined;
 			}
-			var parent1 = treeItems[i];
-			for (let j = 0; j < parent1.children.length; j++) {
-				if (parent1.children[j].label === element.label) {
-					return parent1;
-				}
-				var parent2 = parent1.children[j];
-				for (let k = 0; k < parent2.children.length; k++) {
-					if (parent2.children[k].label === element.label) {
-						return parent2;
-					}
-				}
-			}
+
+			const chapters = generateChapterItems(parentFolder, this.collapsedState);
+			const chapterNameFromPath = path.parse(element.filePath || '').name;
+			const chapterName = element.chapter || chapterNameFromPath;
+
+			return chapters.find(chapter => chapter.chapter === chapterName || chapter.label === chapterName) || undefined;
 		}
+
+		return undefined;
 	}
 	
 	// get the tree item with the given label

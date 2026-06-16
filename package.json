@@ -42,7 +42,13 @@
 				"command": "banque.compile",
 				"key": "ctrl+alt+f1",
 				"when": "editorTextFocus && editorLangId == latex"
+			},
+			{
+				"command": "banque.reveal",
+				"key": "ctrl+alt+f2",
+				"when": "editorTextFocus && editorLangId == latex"
 			}
+
 		],
 		"views": {
 			"package-explorer": [
@@ -150,6 +156,11 @@
 						"/Figures/"
 					],
 					"description": "Définit les chemins d'accès relatifs vers les sous-dossiers de banque.path qui doivent être exclus de l'affichage dans la vue banque d'exercices."
+				},
+				"banque.exoenv": {
+					"type": "string",
+					"default": "exo",
+					"description": "Définit le nom de l'environnement LaTeX qui encadre les énoncés d'exercices dans les fichiers sources. Par défaut, l'environnement est exo."
 				}
 			}
 		}

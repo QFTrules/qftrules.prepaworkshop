@@ -2,6 +2,7 @@
 var vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
+const childProcess = require('child_process');
 const BanqueExoShow = require('./banque');
 // ---------------------------------- //
 
@@ -72,9 +73,23 @@ function hashString(value) {
 	return Math.abs(hash).toString(16);
 }
 
+function toSafeAsciiToken(value, fallback = 'item') {
+	if (typeof value !== 'string' || value.trim() === '') {
+		return fallback;
+	}
+
+	const ascii = value
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.replace(/[^a-zA-Z0-9]+/g, '_')
+		.replace(/^_+|_+$/g, '');
+
+	return ascii.length > 0 ? ascii : fallback;
+}
+
 function buildTempExerciseBasePath(filePath, exo) {
-	const sourceBaseName = path.parse(filePath).name;
-	const safeExoName = exo.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40) || 'exercise';
+	const sourceBaseName = toSafeAsciiToken(path.parse(filePath).name, 'source').slice(0, 40);
+	const safeExoName = toSafeAsciiToken(exo, 'exercise').slice(0, 40);
 	const suffix = hashString(`${filePath}::${exo}`);
 	return path.join(tmpPath, `Exercice_${sourceBaseName}_${safeExoName}_${suffix}`);
 }
@@ -93,9 +108,12 @@ function resolveLatexOutDir(rootFilePath) {
 
 	const resolvedOutDir = rawOutDir
 		.replace(/%DIR%/g, rootDir)
+		.replace(/%DIR_W32%/g, rootDir)
 		.replace(/%WORKSPACE_FOLDER%/g, workspaceFolderPath)
 		.replace(/%DOC%/g, parsedRootFile.name)
 		.replace(/%DOCFILE%/g, parsedRootFile.base)
+		.replace(/%DOC_EXT%/g, parsedRootFile.ext)
+		.replace(/%RELATIVE_DIR%/g, path.relative(workspaceFolderPath, rootDir))
 		.replace(/%TMPDIR%/g, tmpPath);
 
 	return path.isAbsolute(resolvedOutDir)
@@ -103,21 +121,150 @@ function resolveLatexOutDir(rootFilePath) {
 		: path.resolve(rootDir, resolvedOutDir);
 }
 
+function findPdfRecursively(baseDir, pdfBaseName, minMtimeMs = 0) {
+	if (!baseDir || !fs.existsSync(baseDir) || !fs.statSync(baseDir).isDirectory()) {
+		return undefined;
+	}
+
+	let stack = [baseDir];
+	const targetName = `${pdfBaseName}.pdf`;
+
+	while (stack.length > 0) {
+		const current = stack.pop();
+		let entries = [];
+		try {
+			entries = fs.readdirSync(current, { withFileTypes: true });
+		} catch (error) {
+			continue;
+		}
+
+		for (const entry of entries) {
+			const entryPath = path.join(current, entry.name);
+			if (entry.isFile() && entry.name === targetName) {
+				try {
+					const stats = fs.statSync(entryPath);
+					if (stats.mtimeMs >= minMtimeMs) {
+						return entryPath;
+					}
+				} catch (error) {
+					// Ignore stat errors and keep searching.
+				}
+			}
+			if (entry.isDirectory()) {
+				stack.push(entryPath);
+			}
+		}
+	}
+
+	return undefined;
+}
+
+function collectRecentPdfs(baseDir, minMtimeMs = 0) {
+	if (!baseDir || !fs.existsSync(baseDir) || !fs.statSync(baseDir).isDirectory()) {
+		return [];
+	}
+
+	const matches = [];
+	const stack = [baseDir];
+
+	while (stack.length > 0) {
+		const current = stack.pop();
+		let entries = [];
+		try {
+			entries = fs.readdirSync(current, { withFileTypes: true });
+		} catch (error) {
+			continue;
+		}
+
+		for (const entry of entries) {
+			const entryPath = path.join(current, entry.name);
+			if (entry.isDirectory()) {
+				stack.push(entryPath);
+				continue;
+			}
+			if (!entry.isFile() || !entry.name.endsWith('.pdf')) {
+				continue;
+			}
+
+			try {
+				const stats = fs.statSync(entryPath);
+				if (stats.mtimeMs >= minMtimeMs) {
+					matches.push({ path: entryPath, mtimeMs: stats.mtimeMs });
+				}
+			} catch (error) {
+				// Ignore stat errors and continue.
+			}
+		}
+	}
+
+	return matches;
+}
+
+function findRecentPdfFallback(rootFilePath, minMtimeMs = 0) {
+	const parsedRootFile = path.parse(rootFilePath);
+	const outDir = resolveLatexOutDir(rootFilePath);
+	const workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(rootFilePath));
+	const workspaceFolderPath = workspaceFolder ? workspaceFolder.uri.fsPath : path.dirname(rootFilePath);
+	const candidateDirs = [outDir, tmpPath, workspaceFolderPath, path.dirname(rootFilePath)];
+
+	const rootHashMatch = parsedRootFile.name.match(/_([0-9a-f]{8})$/i);
+	const rootHash = rootHashMatch ? rootHashMatch[1].toLowerCase() : undefined;
+
+	let recentPdfs = [];
+	for (const directory of candidateDirs) {
+		recentPdfs = recentPdfs.concat(collectRecentPdfs(directory, minMtimeMs));
+	}
+
+	if (recentPdfs.length === 0) {
+		return undefined;
+	}
+
+	if (rootHash) {
+		const hashMatches = recentPdfs.filter(entry => path.basename(entry.path).toLowerCase().includes(rootHash));
+		if (hashMatches.length > 0) {
+			hashMatches.sort((a, b) => b.mtimeMs - a.mtimeMs);
+			return hashMatches[0].path;
+		}
+	}
+
+	recentPdfs.sort((a, b) => b.mtimeMs - a.mtimeMs);
+	return recentPdfs[0].path;
+}
+
 function delay(milliseconds) {
 	return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 
-async function waitForPdf(rootFilePath, attempts = 10, delayMs = 150) {
+async function waitForPdf(rootFilePath, attempts = 10, delayMs = 150, minMtimeMs = 0) {
 	const parsedRootFile = path.parse(rootFilePath);
+	const outDir = resolveLatexOutDir(rootFilePath);
+	const workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(rootFilePath));
+	const workspaceFolderPath = workspaceFolder ? workspaceFolder.uri.fsPath : path.dirname(rootFilePath);
 	const candidatePaths = [
 		path.join(path.dirname(rootFilePath), `${parsedRootFile.name}.pdf`),
-		path.join(resolveLatexOutDir(rootFilePath), `${parsedRootFile.name}.pdf`),
+		path.join(outDir, `${parsedRootFile.name}.pdf`),
+		path.join(tmpPath, `${parsedRootFile.name}.pdf`),
 	];
 
 	for (let attempt = 0; attempt < attempts; attempt++) {
 		for (const candidatePath of candidatePaths) {
 			if (fs.existsSync(candidatePath)) {
-				return candidatePath;
+				try {
+					const stats = fs.statSync(candidatePath);
+					if (stats.mtimeMs >= minMtimeMs) {
+						return candidatePath;
+					}
+				} catch (error) {
+					// Ignore stat errors and keep searching.
+				}
+			}
+		}
+
+		const recursiveCandidates = [outDir, tmpPath, workspaceFolderPath, path.dirname(rootFilePath)];
+		for (const directory of recursiveCandidates) {
+			const match = findPdfRecursively(directory, parsedRootFile.name, minMtimeMs);
+			if (match) {
+				return match;
 			}
 		}
 
@@ -145,29 +292,51 @@ async function openPdfInSecondColumn(pdfPath) {
 	});
 }
 
-async function ensureBuildEditor(rootFilePath) {
-	if (vscode.window.activeTextEditor) {
-		return undefined;
-	}
+async function runLatexWorkshopBuild(rootFilePath) {
+	const buildAttempts = [
+		() => vscode.commands.executeCommand('latex-workshop.build', false, rootFilePath, 'latex', 'pdflatex'),
+		() => vscode.commands.executeCommand('latex-workshop.build', { rootFile: rootFilePath }),
+		() => vscode.commands.executeCommand('latex-workshop.build', rootFilePath),
+	];
 
-	const document = await vscode.workspace.openTextDocument(vscode.Uri.file(rootFilePath));
-	await vscode.window.showTextDocument(document, {
-		viewColumn: vscode.ViewColumn.One,
-		preview: true,
-		preserveFocus: false,
-	});
-
-	return rootFilePath;
-}
-
-async function closeTabByPath(filePath) {
-	for (const group of vscode.window.tabGroups.all) {
-		const tab = group.tabs.find(candidate => candidate.input && candidate.input.uri && candidate.input.uri.fsPath === filePath);
-		if (tab) {
-			await vscode.window.tabGroups.close(tab, true);
-			return;
+	for (const attempt of buildAttempts) {
+		try {
+			await attempt();
+			return true;
+		} catch (error) {
+			// Try next invocation shape for compatibility across versions/settings.
 		}
 	}
+
+	return false;
+}
+
+function runDirectTexBuild(rootFilePath) {
+	const rootDir = path.dirname(rootFilePath);
+	const commands = [
+		{
+			command: 'latexmk',
+			args: ['-pdf', '-interaction=nonstopmode', '-synctex=1', '-shell-escape', `-outdir=${rootDir}`, rootFilePath],
+		},
+		{
+			command: 'pdflatex',
+			args: ['-interaction=nonstopmode', '-synctex=1', '-shell-escape', '-output-directory', rootDir, rootFilePath],
+		},
+	];
+
+	for (const entry of commands) {
+		try {
+			childProcess.execFileSync(entry.command, entry.args, {
+				cwd: rootDir,
+				stdio: 'ignore',
+			});
+			return true;
+		} catch (error) {
+			// Try next available TeX command.
+		}
+	}
+
+	return false;
 }
 
 // find all subdirectories, WHATEVER THE DEPTH, within directory basePath that are called dirName
@@ -192,34 +361,6 @@ function findDirectories(basePath, dirName) {
     }
 
     return results;
-}
-
-// insert the TEX root line at the beginning of the file
-function insertLatexMagic(editor, rootFile) {
-	// get text of the active editor
-	const editorText = editor.document.getText();
-	// define latex magic line
-	const latex_magic = `% !TEX root = ${rootFile}.tex`;
-	// add this line if not present at the beginning of the file
-	if (editorText.includes(`% !TEX root `)) {
-		editor.edit(editBuilder => {
-			// get line number that contains the magic line
-			const lineIndex = editorText.indexOf(latex_magic);
-			const line = editor.document.lineAt(editor.document.positionAt(lineIndex).line);
-			// delete the line
-			editBuilder.delete(line.range);
-			// insert the magic line at the beginning of the file
-		}).then(() => {
-			editor.edit(editBuilder => {
-				editBuilder.insert(new vscode.Position(0, 0), latex_magic);
-			});
-		}
-		);
-	}  else {
-		editor.edit(editBuilder => {
-			editBuilder.insert(new vscode.Position(0, 0), latex_magic);
-		});
-	}
 }
 
 // update the graphics path in exercice.sty
@@ -313,8 +454,12 @@ function activate() {
 
 			editor.edit(editBuilder => {
 				editBuilder.insert(new vscode.Position(0, 0), exo);
+			}).then(applied => {
+				if (!applied) {
+					return;
+				}
 
-				const searchString = '{nom-exercice}';
+				const searchString = 'nom-exercice';
 				const openedDocument = editor.document;
 				const text = openedDocument.getText();
 				const position = text.indexOf(searchString);
@@ -542,99 +687,187 @@ function activate() {
 			fs.mkdirSync(tmpPath, { recursive: true });
 		}
 
-		// insert the TEX root line at the beginning of the file only when called from an editor
-		if (document === undefined && editor) {
-			insertLatexMagic(editor, exercice);
-		}
 		// create the exercise latex file
 		const template = `\\input{${toTexPath(runtimeExerciceStyPath)}}\n\\Corrige\n\\begin{document}\n\\Source{${toTexPath(FilePath)}}\n\\Exercice{${exo}}\n\\end{document}`;
 		fs.writeFileSync(exerciceTexPath, template);
-		// compile and open the exercise
-		const temporaryEditorPath = await ensureBuildEditor(exerciceTexPath);
+		const buildStartedAt = Date.now();
+		const buildStarted = await runLatexWorkshopBuild(exerciceTexPath);
+		let pdfPath = await waitForPdf(exerciceTexPath, 12, 200, buildStartedAt - 1000);
 
-		vscode.commands.executeCommand('latex-workshop.build', false, exerciceTexPath, 'latex', 'pdflatex').then(async () => {
-			const pdfPath = await waitForPdf(exerciceTexPath);
-
-			if (!pdfPath) {
-				if (temporaryEditorPath) {
-					await closeTabByPath(temporaryEditorPath);
-				}
-				vscode.window.showWarningMessage(`Compilation terminée, mais le PDF de l'exercice « ${exo} » est introuvable.`);
-				return;
+		if (!pdfPath) {
+			const fallbackStartedAt = Date.now();
+			const fallbackBuilt = runDirectTexBuild(exerciceTexPath);
+			if (fallbackBuilt) {
+				pdfPath = await waitForPdf(exerciceTexPath, 20, 150, fallbackStartedAt - 1000);
 			}
+		}
 
-			// message to show that the exercise has been compiled
-			vscode.window.showInformationMessage(`Exercice « ${exo} » compilé avec succès.`);
-			if (temporaryEditorPath) {
-				await closeTabByPath(temporaryEditorPath);
-			}
-			await openPdfInSecondColumn(pdfPath);
-		});
+		if (!pdfPath) {
+			pdfPath = findRecentPdfFallback(exerciceTexPath, buildStartedAt - 1500);
+		}
+
+		// Final fallback: accept any existing matching PDF (even not freshly rewritten),
+		// useful when latexmk reports outputs as already up to date.
+		if (!pdfPath) {
+			pdfPath = await waitForPdf(exerciceTexPath, 1, 0, 0);
+		}
+
+		if (!pdfPath) {
+			pdfPath = findRecentPdfFallback(exerciceTexPath, 0);
+		}
+
+		if (!pdfPath) {
+			const buildInfo = buildStarted ? 'La commande de compilation a été lancée.' : 'Impossible de lancer la commande latex-workshop.build.';
+			vscode.window.showWarningMessage(`${buildInfo} PDF de l'exercice « ${exo} » introuvable, y compris après tentative locale pdflatex/latexmk.`);
+			return;
+		}
+
+		// message to show that the exercise has been compiled
+		vscode.window.showInformationMessage(`Exercice « ${exo} » compilé avec succès.`);
+		await openPdfInSecondColumn(pdfPath);
 		
 	});
 
 	// FUNCTIONS ONLY USED AS KEYBINDINGS //
 	// command to reveal an exercise of a latex file in the tree view
-	vscode.commands.registerCommand('banque.reveal', function () {
+	vscode.commands.registerCommand('banque.reveal', async function () {
 		
 		// get the active text editor
 		let editor = vscode.window.activeTextEditor;
 		if (!editor) {
 			return;
 		}
-	
-		// get label of exercise from current mouse position
+
 		const cursorPosition = editor.selection.active;
 		const editorText = editor.document.getText();
-		// find the first line before the cursor position that contains the string '\begin{exo}'
+
+		function toChapterName(value) {
+			if (!value || typeof value !== 'string') {
+				return undefined;
+			}
+			const trimmed = value.trim();
+			if (trimmed === '') {
+				return undefined;
+			}
+			return path.parse(path.basename(trimmed)).name;
+		}
+
+		function extractExerciseLabel(line) {
+			const patterns = [
+				/^\s*\\begin\{exo\}(?:\[[^\]]*\])*\{([^}]*)\}/i,
+				/^\s*\\begin\{Exocolle\}(?:\[[^\]]*\])*\{([^}]*)\}/i,
+				/^\s*\\Exercice\{([^}]*)\}/,
+				/^\s*\\Ex(?:\[[^\]]*\])?\{([^}]*)\}/,
+			];
+
+			for (const pattern of patterns) {
+				const match = line.match(pattern);
+				if (match && match[1]) {
+					return match[1].trim();
+				}
+			}
+			return undefined;
+		}
+
+		function findEnclosingExerciseHeaderLine(cursorLine) {
+			const stack = [];
+			for (let index = 0; index <= cursorLine; index++) {
+				const line = editor.document.lineAt(index).text;
+
+				const beginExoMatch = line.match(/^\s*\\begin\{exo\}(?:\[[^\]]*\])*\{([^}]*)\}/i);
+				if (beginExoMatch) {
+					stack.push({ env: 'exo', index, text: line });
+				}
+
+				const beginExocolleMatch = line.match(/^\s*\\begin\{Exocolle\}(?:\[[^\]]*\])*\{([^}]*)\}/i);
+				if (beginExocolleMatch) {
+					stack.push({ env: 'Exocolle', index, text: line });
+				}
+
+				const endExocolleCount = (line.match(/\\end\{Exocolle\}/g) || []).length;
+				for (let count = 0; count < endExocolleCount; count++) {
+					for (let pos = stack.length - 1; pos >= 0; pos--) {
+						if (stack[pos].env === 'Exocolle') {
+							stack.splice(pos, 1);
+							break;
+						}
+					}
+				}
+
+				const endExoCount = (line.match(/\\end\{exo\}/g) || []).length;
+				for (let count = 0; count < endExoCount; count++) {
+					for (let pos = stack.length - 1; pos >= 0; pos--) {
+						if (stack[pos].env === 'exo') {
+							stack.splice(pos, 1);
+							break;
+						}
+					}
+				}
+			}
+
+			if (stack.length === 0) {
+				return undefined;
+			}
+
+			const top = stack[stack.length - 1];
+			return { index: top.index, text: top.text };
+		}
+
+		function extractChapterFromExCall(line) {
+			const match = line.match(/\\Ex(?:ercice)?\[([^\]]+)\]\{/i);
+			if (!match || !match[1]) {
+				return undefined;
+			}
+			return toChapterName(match[1]);
+		}
+
 		let lineNumber = cursorPosition.line;
-		let lineText = editor.document.lineAt(lineNumber).text;
-		
-		// get document filename and folder name 
-		if (lineText.includes('begin{Exocolle}') || editorText.includes('\\Source')) { // Source
-			// exo
-			var startexo = lineText.indexOf('{', lineText.indexOf('{') + 1) + 1;
-			var endexo = lineText.lastIndexOf('}');
-			var exo = lineText.substring(startexo, endexo);
-			// fileName
-			const sourceIndex = editorText.indexOf('\\Source{');
-			if (sourceIndex < 0) {
-				vscode.window.showErrorMessage('Commande \\Source introuvable dans le document courant.');
-				return;
+		const currentLine = editor.document.lineAt(lineNumber).text;
+		let matchedLine = currentLine;
+		let exo = extractExerciseLabel(matchedLine);
+		if (!exo) {
+			const enclosingHeader = findEnclosingExerciseHeaderLine(lineNumber);
+			if (enclosingHeader) {
+				lineNumber = enclosingHeader.index;
+				matchedLine = enclosingHeader.text;
+				exo = extractExerciseLabel(matchedLine);
 			}
-			var start = sourceIndex + ('\\Source{').length;
-			var end = editorText.indexOf('.tex}', start);
-			if (end < 0) {
-				vscode.window.showErrorMessage('Format de \\Source invalide (suffixe .tex manquant).');
-				return;
-			}
-			var fileName = editorText.substring(start, end);
-			var folderName = 'undefined';
 		}
-		else { // Source en argument de \Ex[]{}
-			// exo 
-			var startexo = lineText.indexOf('{') + 1;
-			var endexo = lineText.lastIndexOf('}');
-			var exo = lineText.substring(startexo, endexo);
-			// fileName
-			var start = lineText.indexOf('[') +1;
-			var end = lineText.indexOf(']');
-			if (start <= 0 || end <= start) {
-				vscode.window.showErrorMessage('Format de la source dans \\Ex[] invalide.');
-				return;
+
+		if (!exo) {
+			const exoInGeneratedDocument = editorText.match(/\\Exercice\{([^}]+)\}/);
+			if (exoInGeneratedDocument && exoInGeneratedDocument[1]) {
+				exo = exoInGeneratedDocument[1].trim();
 			}
-			var fileName = lineText.substring(start, end);
-			var folderName = 'undefined';
 		}
-		// hihglight the exercise in the editor
+
+		if (!exo) {
+			vscode.window.showErrorMessage('Nom d\'exercice introuvable autour du curseur.');
+			return;
+		}
+
+		let fileName = toChapterName(editor.document.fileName);
+		const sourceMatch = editorText.match(/\\Source\{([^}]+)\}/);
+		if (sourceMatch && sourceMatch[1]) {
+			fileName = toChapterName(sourceMatch[1]) || fileName;
+		}
+
+		const chapterFromExCall = extractChapterFromExCall(currentLine) || extractChapterFromExCall(matchedLine);
+		if (chapterFromExCall) {
+			fileName = chapterFromExCall;
+		}
+
+		const folderName = 'undefined';
+
+		// highlight the exercise in the editor
 		vscode.commands.executeCommand('extension.selectCurlyBrackets', {label: exo});
 
-		const item = banqueProvider.getTreeItemByLabel(folderName,fileName,exo);
+		const item = banqueProvider.getTreeItemByLabel(folderName, fileName, exo);
 		if (!item) {
 			vscode.window.showErrorMessage(`Exercice « ${exo} » introuvable dans la banque.`);
 			return;
 		}
-		banqueTreeView.reveal(item, {focus: true, select: true, expand: true});
+		await banqueTreeView.reveal(item, {focus: true, select: true, expand: true});
 	});
 
 	// COMMANDS AT LAUNCH //
