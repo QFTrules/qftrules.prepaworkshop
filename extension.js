@@ -121,79 +121,32 @@ function resolveLatexOutDir(rootFilePath) {
 		: path.resolve(rootDir, resolvedOutDir);
 }
 
-function findPdfRecursively(baseDir, pdfBaseName, minMtimeMs = 0) {
-	if (!baseDir || !fs.existsSync(baseDir) || !fs.statSync(baseDir).isDirectory()) {
-		return undefined;
-	}
-
-	let stack = [baseDir];
-	const targetName = `${pdfBaseName}.pdf`;
-
-	while (stack.length > 0) {
-		const current = stack.pop();
-		let entries = [];
-		try {
-			entries = fs.readdirSync(current, { withFileTypes: true });
-		} catch (error) {
-			continue;
-		}
-
-		for (const entry of entries) {
-			const entryPath = path.join(current, entry.name);
-			if (entry.isFile() && entry.name === targetName) {
-				try {
-					const stats = fs.statSync(entryPath);
-					if (stats.mtimeMs >= minMtimeMs) {
-						return entryPath;
-					}
-				} catch (error) {
-					// Ignore stat errors and keep searching.
-				}
-			}
-			if (entry.isDirectory()) {
-				stack.push(entryPath);
-			}
-		}
-	}
-
-	return undefined;
-}
-
 function collectRecentPdfs(baseDir, minMtimeMs = 0) {
 	if (!baseDir || !fs.existsSync(baseDir) || !fs.statSync(baseDir).isDirectory()) {
 		return [];
 	}
 
 	const matches = [];
-	const stack = [baseDir];
+	let entries = [];
+	try {
+		entries = fs.readdirSync(baseDir, { withFileTypes: true });
+	} catch (error) {
+		return matches;
+	}
 
-	while (stack.length > 0) {
-		const current = stack.pop();
-		let entries = [];
-		try {
-			entries = fs.readdirSync(current, { withFileTypes: true });
-		} catch (error) {
+	for (const entry of entries) {
+		const entryPath = path.join(baseDir, entry.name);
+		if (!entry.isFile() || !entry.name.endsWith('.pdf')) {
 			continue;
 		}
 
-		for (const entry of entries) {
-			const entryPath = path.join(current, entry.name);
-			if (entry.isDirectory()) {
-				stack.push(entryPath);
-				continue;
+		try {
+			const stats = fs.statSync(entryPath);
+			if (stats.mtimeMs >= minMtimeMs) {
+				matches.push({ path: entryPath, mtimeMs: stats.mtimeMs });
 			}
-			if (!entry.isFile() || !entry.name.endsWith('.pdf')) {
-				continue;
-			}
-
-			try {
-				const stats = fs.statSync(entryPath);
-				if (stats.mtimeMs >= minMtimeMs) {
-					matches.push({ path: entryPath, mtimeMs: stats.mtimeMs });
-				}
-			} catch (error) {
-				// Ignore stat errors and continue.
-			}
+		} catch (error) {
+			// Ignore stat errors and continue.
 		}
 	}
 
@@ -203,9 +156,9 @@ function collectRecentPdfs(baseDir, minMtimeMs = 0) {
 function findRecentPdfFallback(rootFilePath, minMtimeMs = 0) {
 	const parsedRootFile = path.parse(rootFilePath);
 	const outDir = resolveLatexOutDir(rootFilePath);
-	const workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(rootFilePath));
-	const workspaceFolderPath = workspaceFolder ? workspaceFolder.uri.fsPath : path.dirname(rootFilePath);
-	const candidateDirs = [outDir, tmpPath, workspaceFolderPath, path.dirname(rootFilePath)];
+	const candidateDirs = [outDir, tmpPath, path.dirname(rootFilePath)]
+		.filter(Boolean)
+		.filter((value, index, values) => values.indexOf(value) === index);
 
 	const rootHashMatch = parsedRootFile.name.match(/_([0-9a-f]{8})$/i);
 	const rootHash = rootHashMatch ? rootHashMatch[1].toLowerCase() : undefined;
@@ -238,13 +191,11 @@ function delay(milliseconds) {
 async function waitForPdf(rootFilePath, attempts = 10, delayMs = 150, minMtimeMs = 0) {
 	const parsedRootFile = path.parse(rootFilePath);
 	const outDir = resolveLatexOutDir(rootFilePath);
-	const workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(rootFilePath));
-	const workspaceFolderPath = workspaceFolder ? workspaceFolder.uri.fsPath : path.dirname(rootFilePath);
 	const candidatePaths = [
 		path.join(path.dirname(rootFilePath), `${parsedRootFile.name}.pdf`),
 		path.join(outDir, `${parsedRootFile.name}.pdf`),
 		path.join(tmpPath, `${parsedRootFile.name}.pdf`),
-	];
+	].filter((value, index, values) => values.indexOf(value) === index);
 
 	for (let attempt = 0; attempt < attempts; attempt++) {
 		for (const candidatePath of candidatePaths) {
@@ -257,14 +208,6 @@ async function waitForPdf(rootFilePath, attempts = 10, delayMs = 150, minMtimeMs
 				} catch (error) {
 					// Ignore stat errors and keep searching.
 				}
-			}
-		}
-
-		const recursiveCandidates = [outDir, tmpPath, workspaceFolderPath, path.dirname(rootFilePath)];
-		for (const directory of recursiveCandidates) {
-			const match = findPdfRecursively(directory, parsedRootFile.name, minMtimeMs);
-			if (match) {
-				return match;
 			}
 		}
 
@@ -692,13 +635,21 @@ function activate() {
 		fs.writeFileSync(exerciceTexPath, template);
 		const buildStartedAt = Date.now();
 		const buildStarted = await runLatexWorkshopBuild(exerciceTexPath);
-		let pdfPath = await waitForPdf(exerciceTexPath, 12, 200, buildStartedAt - 1000);
+		let pdfPath = await waitForPdf(exerciceTexPath, buildStarted ? 20 : 8, 120, buildStartedAt - 1000);
 
-		if (!pdfPath) {
+		if (!pdfPath && !buildStarted) {
 			const fallbackStartedAt = Date.now();
 			const fallbackBuilt = runDirectTexBuild(exerciceTexPath);
 			if (fallbackBuilt) {
-				pdfPath = await waitForPdf(exerciceTexPath, 20, 150, fallbackStartedAt - 1000);
+				pdfPath = await waitForPdf(exerciceTexPath, 12, 120, fallbackStartedAt - 1000);
+			}
+		}
+
+		if (!pdfPath && buildStarted) {
+			const fallbackStartedAt = Date.now();
+			const fallbackBuilt = runDirectTexBuild(exerciceTexPath);
+			if (fallbackBuilt) {
+				pdfPath = await waitForPdf(exerciceTexPath, 8, 120, fallbackStartedAt - 1000);
 			}
 		}
 

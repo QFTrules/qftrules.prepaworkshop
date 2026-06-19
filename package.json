@@ -160,6 +160,12 @@
 					"type": "string",
 					"default": "exo",
 					"description": "Définit le nom de l'environnement LaTeX qui encadre les énoncés d'exercices dans les fichiers sources. Par défaut, l'environnement est exo."
+				},
+				"banque.compile.fastWaitMs": {
+					"type": "number",
+					"default": 1200,
+					"minimum": 200,
+					"description": "Temps (ms) de vérification rapide du PDF attendu avant d'activer les fallbacks lents."
 				}
 			}
 		}
