@@ -43,7 +43,7 @@ $$\frac{\mathrm{d} r}{\mathrm{d} i} = 	 \frac{1}{n} \frac{\cos i}{\cos r}.$$
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{exo}[1][TD]{La lunette astronomique}
-Une lunette astronomique est constituée d'un objectif $\mc{L}_{1}$  de distance focale $f'_{1}=\SI{50}{cm}$ et d'un oculaire $\mc{L}_{2}$ de distance focale $f'_{2}=\SI{2}{cm}$. On note $d=\overline{O_1O_2}$ la distance entre les centres de $\mc{L}_1$ et $\mc{L}_2$.
+Une lunette astronomique est constituée d'un objectif $\mathcal{L}_{1}$  de distance focale $f'_{1}=\SI{50}{cm}$ et d'un oculaire $\mathcal{L}_{2}$ de distance focale $f'_{2}=\SI{2}{cm}$. On note $d=\overline{O_1O_2}$ la distance entre les centres de $\mathcal{L}_1$ et $\mathcal{L}_2$.
 
 \begin{questions}
 	\item Comment régler la distance entre les lentilles pour que le système soit afocal ? Schématiser le doublet de lentilles et représenter la marche de deux rayons particuliers. Quelle est la différence entre  une lunette astronomique et la lunette de Galilée ?
@@ -51,25 +51,26 @@ Une lunette astronomique est constituée d'un objectif $\mc{L}_{1}$  de distance
 	\solution{
 		\begin{enumerate}
 			\item 
-			Considérons un point $A$ à l'infini sur l'axe optique. L'image par l'objectif de $A$, noté $A_1$, se trouve donc en $F_1'$. Or $A_1$ doit également se situer en $F_2$ pour que son image $A'$ par l'oculaire soit rejetée à l'infini, de sorte que l'œil puisse observer un objet lointain sans accommoder. Ainsi $F_1'=F_2$. On peut représenter le système optique par le schéma synoptique suivant,
+			Considérons un point $\rm A$ à l'infini sur l'axe optique. L'image par l'objectif de $\rm A$, noté ${\rm A}_1$, se trouve donc en ${\rm F}_1'$. Or $A_1$ doit également se situer en ${\rm F}_2$ pour que son image $A'$ par l'oculaire soit rejetée à l'infini, de sorte que l'œil puisse observer un objet lointain sans accommoder. Ainsi $F_1'=F_2$. On peut représenter le système optique par le schéma synoptique suivant,
 
-			\eqbox{
-				\infty  \underset{\mc{L}_1}{\rightarrow} F_1' = F_2 \underset{\mc{L}_2}\rightarrow \infty .
-				}
+			\boxed{$$
+				\infty  \underset{\mathcal{L}_1}{\rightarrow} F_1' = F_2 \underset{\mathcal{L}_2}\rightarrow \infty.
+				$$}
 			Ce système ne possède pas de foyer image (l'image d'un objet à l'infini est elle-même à l'infini) ni objet (l'objet donnant une image à l'infini est lui-même à l'infini). On parle donc de \fbox{système afocal}. La distance entre les lentilles vaut donc 
-				\eqbox{
-					d=f_1'+f_2' = 52 \ \mathrm{cm}.
-					}  
-			\item  On se place dans les \udl{conditions de Gauss} : les rayons sont paraxiaux, i.e. peu inclinés par rapport à l'axe optique ($\theta\ll1$) ; et proches de l'axe optique (le rayon doit frapper la lentille près du centre). Pour tracer les rayons, on considère un point objet $B$ à l'infini hors de l'axe optique. On rappelle les trois rayons particuliers que l'on peut utiliser pour tracer la marche des rayons en sortie d'une lentille :
+				\boxed{
+					$$
+					d=f_1'+f_2' = 52\,\mathrm{cm}.
+					$$}  
+			\item  On se place dans les \underline{conditions de Gauss} : les rayons sont paraxiaux, i.e. peu inclinés par rapport à l'axe optique ($\theta\ll1$) ; et proches de l'axe optique (le rayon doit frapper la lentille près du centre). Pour tracer les rayons, on considère un point objet $B$ à l'infini hors de l'axe optique. On rappelle les trois rayons particuliers que l'on peut utiliser pour tracer la marche des rayons en sortie d'une lentille :
 			\begin{itemize}
-				\item celui qui passe par le foyer objet $F$ sort parallèlement à l'axe optique ;
-				\item celui qui passe par le centre optique $O$ sort sans être dévié ;
-				\item celui qui arrive parallèlement à l'axe optique passe par le foyer image $F'$.
+				\item celui qui passe par le foyer objet $\rm F$ sort parallèlement à l'axe optique ;
+				\item celui qui passe par le centre optique $\rm O$ sort sans être dévié ;
+				\item celui qui arrive parallèlement à l'axe optique passe par le foyer image $\rm F'$.
 			\end{itemize}
-			\begin{center}
-				\includegraphics[width=0.45\textwidth]{lunette_astro}
-			\end{center}
-			\item	La lunette de Galilée est aussi constituée d'un doublet de lentilles minces, mais elle n'est \fbox{pas afocale} et permet d'observer des objets proches (terrestres). Elle est constituée d'un objectif convergent $\mc{L}_1$ et d'un oculaire divergent $\mc{L}_2$.
+			% \begin{center}
+			% 	\includegraphics[width=0.45\textwidth]{lunette_astro}
+			% \end{center}
+			\item	La lunette de Galilée est aussi constituée d'un doublet de lentilles minces, mais elle n'est \fbox{pas afocale} et permet d'observer des objets proches (terrestres). Elle est constituée d'un objectif convergent $\mathcal{L}_1$ et d'un oculaire divergent $\mathcal{L}_2$.
 		\end{enumerate}
 	}
 
@@ -78,30 +79,33 @@ Une lunette astronomique est constituée d'un objectif $\mc{L}_{1}$  de distance
 	
   \solution{
 	\begin{enumerate}
-		\item Le \udl{grossissement angulaire} $G$ a pour définition 
-		\eqbox{
+		\item Le \underline{grossissement angulaire} $G$ a pour définition 
+		\boxed{
+			$$
 		G = \frac{\theta'}{\theta},
+		$$
 		}
 		où $\theta'$ est l'angle formé par le rayon sortant de l'oculaire et l'axe optique, et $\theta$ est l'angle formé par le rayon incident sur l'objectif et l'axe optique, pour un faisceau incident parallèle. 
 		\item Pour déterminer $G$ en fonction des distances focales, on utilise des relations de trigonométrie : 
 		$$
 		\tan \theta = \dfrac{\overline{F_2 B_1}}{\overline{O_1F_1'}} = \dfrac{\overline{F_2 B_1}}{f_1'}  \text{ et } \tan \theta' = \dfrac{\overline{F_2 B_1}}{\overline{O_2 F_2'}}  = -\dfrac{\overline{F_2 B_1}}{f_2'}.
 		$$
-		\udl{Remarque} : les distances $\overline{F_2 B_1}$, $\overline{O_1F_1'}$, et $\overline{O_2 F_2'}$ sont algébriques : elles peuvent être positives ou négatives, de même que les angles $\theta$ et $\theta'$. Penser à contrôler systématiquement le signe des relations ! Sur la figure, on a $\theta >0$ et $\theta' <0$.
+		\underline{Remarque} : les distances $\overline{F_2 B_1}$, $\overline{O_1F_1'}$, et $\overline{O_2 F_2'}$ sont algébriques : elles peuvent être positives ou négatives, de même que les angles $\theta$ et $\theta'$. Penser à contrôler systématiquement le signe des relations ! Sur la figure, on a $\theta >0$ et $\theta' <0$.
 
 
-		Dans les \udl{conditions de Gauss}, $\tan \theta \simeq \theta$ et $\tan \theta' \simeq \theta'$,
+		Dans les \underline{conditions de Gauss}, $\tan \theta \simeq \theta$ et $\tan \theta' \simeq \theta'$,
 		et donc,
 		$$
 		G=\frac{\theta'}{\theta} \simeq \frac{\tan \theta'}{\tan \theta} \simeq -\dfrac{\overline{F_2 B_1}}{f_2'} \times \frac{f_1'}{\overline{F_2 B_1}},
 		$$
 		soit 
-		\eqbox{
+		\boxed{$$
 		G \simeq -\frac{f_1'}{f_2'}.
+		$$
 		}
-		\AN~: \fbox{$G= -25$}. Le signe négatif indique que l'image est renversée.
+		Application numérique : \fbox{$G= -25$}. Le signe négatif indique que l'image est renversée.
 
-		\item Le \udl{grandissement transversal} n'est pas défini pour un système afocal, puisque l'objet $AB$ et l'image $A'B'$ sont de taille infinie.
+		\item Le \underline{grandissement transversal} n'est pas défini pour un système afocal, puisque l'objet $AB$ et l'image $A'B'$ sont de taille infinie.
 	\end{enumerate}
 	}
 \end{questions}
