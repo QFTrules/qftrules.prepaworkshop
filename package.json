@@ -98,6 +98,11 @@
 				"command": "banque.collapse",
 				"title": "Réduire",
 				"icon": "$(collapse-all)"
+			},
+			{
+				"command": "banque.sort",
+				"title": "Trier",
+				"icon": "$(sort-precedence)"
 			}
 		],
 		"menus": {
@@ -130,6 +135,11 @@
 					"command": "banque.refresh",
 					"when": "view == banque-exercices",
 					"group": "navigation@4"
+				},
+				{
+					"command": "banque.sort",
+					"when": "view == banque-exercices",
+					"group": "navigation@3"
 				},
 				{
 					"command": "banque.collapse",

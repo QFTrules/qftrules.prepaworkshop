@@ -149,6 +149,49 @@ function generateTreeItems(collapsedState = undefined) {
 
 // TREE VIEW CLASS //
 class BanqueExoShow {
+	static sortMode = 'file';
+	static outputChannel = null;
+	static cache = {}; // filePath -> {mtime, exercises}
+
+	static log(message) {
+		if (BanqueExoShow.outputChannel) {
+			BanqueExoShow.outputChannel.appendLine(message);
+		}
+		console.log(message);
+	}
+
+	static getExercises(filePath) {
+		const stats = fs.statSync(filePath);
+		const cached = BanqueExoShow.cache[filePath];
+
+		if (cached && cached.mtime === stats.mtimeMs) {
+			return cached.exercises;
+		}
+
+		const fileContent = safeReadFile(filePath);
+		const exercices = fileContent.split('\n').filter(line => line.includes('\\begin{exo}'));
+		BanqueExoShow.cache[filePath] = { mtime: stats.mtimeMs, exercises: exercices };
+		return exercices;
+	}
+
+	static sortItems(items, mode) {
+		if (!items || items.length === 0) return items;
+		const sorted = [...items];
+
+		if (mode === 'alpha') {
+			sorted.sort((a, b) => a.label.localeCompare(b.label));
+		} else if (mode === 'type') {
+			sorted.sort((a, b) => {
+				const typeA = a.typeExo || 'undefined';
+				const typeB = b.typeExo || 'undefined';
+				return typeA.localeCompare(typeB);
+			});
+		} else if (mode === 'difficulty') {
+			sorted.sort((a, b) => parseInt(b.difficulty || '0') - parseInt(a.difficulty || '0'));
+		}
+
+		return sorted;
+	}
 
 	// constructor
     constructor(collapsedState = undefined) {
@@ -168,14 +211,14 @@ class BanqueExoShow {
 		// var item = element;
 		var item = new TreeItem(element.label, element.children, element.filePath, element.contextValue, vscode.TreeItemCollapsibleState.Collapsed, element.typeExo, element.difficulty, element.chapter, element.theme);
 		if (element.contextValue === 'file') {
-			item.tooltip = "Voir l'exercice";
+			item.tooltip = `Voir l'exercice (${element.typeExo || 'undefined'})`;
 			item.command = {
 				command: 'banque.fetch',
 				title: 'Ouvrir exercice',
 				arguments: [element],
 			}
-		} 
-		
+		}
+
 		return item;
 	};
 
@@ -188,7 +231,8 @@ class BanqueExoShow {
 			return generateChapterItems(element, this.collapsedState);
 		}
 		if (element.contextValue === 'chapter') {
-			return generateExerciseItems(element);
+			const exercises = generateExerciseItems(element);
+			return BanqueExoShow.sortItems(exercises, BanqueExoShow.sortMode);
 		}
         return element.children;
     };

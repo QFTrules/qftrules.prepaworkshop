@@ -352,6 +352,11 @@ function update_graphics_path() {
 
 function activate() {
 	console.log('The extension "prepa-workshop" is now active!');
+
+	// Create output channel for banque logs
+	const outputChannel = vscode.window.createOutputChannel('prepaworkshop-banque');
+	BanqueExoShow.outputChannel = outputChannel;
+
 	runtimeExerciceStyPath = update_graphics_path();
 	const banqueProvider = new BanqueExoShow();
 	const banqueTreeView = vscode.window.createTreeView('banque-exercices', { treeDataProvider: banqueProvider });
@@ -520,6 +525,21 @@ function activate() {
 			} catch (error) {
 				// Ignore stale nodes (e.g. tree changed since snapshot).
 			}
+		}
+	});
+
+	// Sort exercises by different criteria
+	vscode.commands.registerCommand('banque.sort', async function () {
+		const modes = [
+			{ label: 'par ordre du fichier source', value: 'file' },
+			{ label: 'par ordre alphabétique', value: 'alpha' },
+			{ label: 'par type', value: 'type' },
+			{ label: 'par difficulté', value: 'difficulty' }
+		];
+		const choice = await vscode.window.showQuickPick(modes, { placeHolder: 'Sélectionner un tri' });
+		if (choice) {
+			BanqueExoShow.sortMode = choice.value;
+			banqueProvider.refresh();
 		}
 	});
 
