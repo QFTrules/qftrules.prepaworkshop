@@ -52,6 +52,11 @@
 		"views": {
 			"package-explorer": [
 				{
+					"id": "banque-search",
+					"name": "Recherche d'exercices",
+					"type": "webview"
+				},
+				{
 					"id": "banque-exercices",
 					"name": "Banque d'exercices",
 					"type": "tree",
@@ -103,6 +108,14 @@
 				"command": "banque.sort",
 				"title": "Trier",
 				"icon": "$(sort-precedence)"
+			},
+			{
+				"command": "banque.search",
+				"title": "Rechercher exercices"
+			},
+			{
+				"command": "banque.search.clear",
+				"title": "Effacer recherche"
 			}
 		],
 		"menus": {

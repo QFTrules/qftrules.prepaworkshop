@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const childProcess = require('child_process');
 const BanqueExoShow = require('./banque');
+const BanqueSearchViewProvider = require('./views/banqueSearchViewProvider');
 // ---------------------------------- //
 
 // PATHS //
@@ -360,6 +361,10 @@ function activate() {
 	runtimeExerciceStyPath = update_graphics_path();
 	const banqueProvider = new BanqueExoShow();
 	const banqueTreeView = vscode.window.createTreeView('banque-exercices', { treeDataProvider: banqueProvider });
+	const banqueSearchViewProvider = new BanqueSearchViewProvider(banqueProvider);
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider('banque-search', banqueSearchViewProvider)
+	);
 	const expandedNodes = new Map();
 
 	function nodeKey(element) {
@@ -541,6 +546,67 @@ function activate() {
 			BanqueExoShow.sortMode = choice.value;
 			banqueProvider.refresh();
 		}
+	});
+
+	// Search handler from WebView
+	vscode.commands.registerCommand('banque.search.fromWebview', async function (query) {
+		console.log('[SEARCH] WebView search for:', query);
+
+		if (query.trim() === '') {
+			// Clear search and collapse tree
+			banqueProvider.refresh();
+			vscode.commands.executeCommand('banque.collapse');
+			banqueSearchViewProvider.clearNoResults();
+		} else {
+			// Perform search
+			const results = banqueProvider.searchExercises(query);
+			if (results.length === 0) {
+				// No results found
+				banqueProvider.refresh();
+				banqueSearchViewProvider.showNoResults();
+				vscode.commands.executeCommand('workbench.view.extension.banque-exercices');
+				setTimeout(() => {
+					vscode.commands.executeCommand('list.collapseAll');
+				}, 100);
+			} else {
+				// Found results
+				banqueProvider.searchResults = results;
+				banqueProvider.isSearchMode = true;
+				banqueSearchViewProvider.showResultsMessage(
+					`${results.reduce((sum, t) => sum + (t.children ? t.children.reduce((s, c) => s + (c.children ? c.children.length : 0), 0) : 0), 0)} exercices trouvés`
+				);
+				banqueProvider.refresh();
+				// Auto-expand results
+				if (results && results.length > 0) {
+					setTimeout(async () => {
+						for (const theme of results) {
+							try {
+								await banqueTreeView.reveal(theme, { focus: false, select: false, expand: true });
+								if (theme.children) {
+									for (const chapter of theme.children) {
+										try {
+											await banqueTreeView.reveal(chapter, { focus: false, select: false, expand: true });
+										} catch (e) {
+											// Ignore reveal errors
+										}
+									}
+								}
+							} catch (e) {
+								// Ignore reveal errors
+							}
+						}
+					}, 100);
+				}
+			}
+		}
+	});
+
+	// Clear search handler
+	vscode.commands.registerCommand('banque.search.clear', function () {
+		banqueProvider.isSearchMode = false;
+		banqueProvider.searchResults = [];
+		banqueProvider.refresh();
+		BanqueExoShow.log('[SEARCH] Search cleared');
 	});
 
 	// FUNCTIONS OF VIEW - ITEM - EXERCICE //

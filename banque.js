@@ -199,6 +199,8 @@ class BanqueExoShow {
 		this._onDidChangeTreeData = new vscode.EventEmitter();
 		this.onDidChangeTreeData = this._onDidChangeTreeData.event;
 		this.data = generateTreeItems(collapsedState);
+		this.isSearchMode = false;
+		this.searchResults = [];
     }
 
 	refresh() {
@@ -225,7 +227,7 @@ class BanqueExoShow {
 	// define here the children of the tree items
     getChildren(element) {
         if (element === undefined) {
-            return this.data;
+            return this.isSearchMode ? this.searchResults : this.data;
         }
 		if (element.contextValue === 'folder') {
 			return generateChapterItems(element, this.collapsedState);
@@ -296,6 +298,69 @@ class BanqueExoShow {
 				}
 			}
 		}
+	}
+
+	searchExercises(query) {
+		if (!query || query.trim() === '') {
+			return [];
+		}
+
+		const queryLower = query.toLowerCase();
+		const results = [];
+
+		for (const theme of this.data) {
+			const matchingChapters = [];
+
+			const chapters = generateChapterItems(theme, this.collapsedState);
+			for (const chapter of chapters) {
+				const exercises = generateExerciseItems(chapter);
+				const matchingExercises = exercises.filter(exercise =>
+					exercise.label.toLowerCase().includes(queryLower)
+				);
+
+				if (matchingExercises.length > 0) {
+					const chapterWithMatches = new TreeItem(
+						chapter.label,
+						matchingExercises,
+						chapter.filePath,
+						chapter.contextValue,
+						chapter.collapsibleState,
+						chapter.typeExo,
+						chapter.difficulty,
+						chapter.chapter,
+						chapter.theme
+					);
+					matchingChapters.push(chapterWithMatches);
+				}
+			}
+
+			if (matchingChapters.length > 0) {
+				const themeWithMatches = new TreeItem(
+					theme.label,
+					matchingChapters,
+					theme.filePath,
+					theme.contextValue,
+					theme.collapsibleState,
+					theme.typeExo,
+					theme.difficulty,
+					theme.chapter,
+					theme.theme
+				);
+				results.push(themeWithMatches);
+			}
+		}
+
+		return results;
+	}
+
+	setSearchResults(results, query) {
+		this.searchResults = results;
+		this.isSearchMode = true;
+	}
+
+	clearSearchResults() {
+		this.searchResults = [];
+		this.isSearchMode = false;
 	}
 
 	// get the tree item with the given label
