@@ -580,23 +580,43 @@ function activate(context) {
 	// Search handler from WebView
 	vscode.commands.registerCommand('banque.search.fromWebview', async function (query) {
 		console.log('[SEARCH] WebView search for:', query);
+		const handlerStart = performance.now();
 
 		if (query.trim() === '') {
 			// Clear search and collapse tree
+			banqueProvider.isSearchMode = false;
+			banqueProvider.searchResults = [];
 			banqueProvider.refresh();
 			vscode.commands.executeCommand('banque.collapse');
 			banqueSearchViewProvider.clearNoResults();
 		} else {
 			// Perform search
-			const results = banqueProvider.searchExercises(query);
+			const searchStart = performance.now();
+			const searchData = banqueProvider.searchExercises(query);
+			const searchDuration = performance.now() - searchStart;
+			const results = searchData.results;
+			const metrics = searchData.metrics || {};
+
+			// Log performance metrics
+			if (metrics.queryNormalizeTime !== undefined) {
+				BanqueExoShow.log(`⏱️ [SEARCH] Query normalization: ${metrics.queryNormalizeTime.toFixed(2)}ms`);
+			}
+			if (metrics.themeLoopTime !== undefined) {
+				BanqueExoShow.log(`⏱️ [SEARCH] Search processing: ${metrics.themeLoopTime.toFixed(2)}ms`);
+			}
+			BanqueExoShow.log(`⏱️ [SEARCH] Total search time: ${metrics.totalTime?.toFixed(2) || searchDuration.toFixed(2)}ms`);
+
 			if (results.length === 0) {
-				// No results found
+				// No results found - clear search state to show all folders
+				banqueProvider.searchResults = [];
+				banqueProvider.isSearchMode = false;
 				banqueProvider.refresh();
 				banqueSearchViewProvider.showNoResults();
 				vscode.commands.executeCommand('workbench.view.extension.banque-exercices');
 				setTimeout(() => {
 					vscode.commands.executeCommand('list.collapseAll');
 				}, 100);
+				BanqueExoShow.log(`[SEARCH] No results found for: "${query}"`);
 			} else {
 				// Found results - use proper method to update state
 				const counts = countSearchResults(results);

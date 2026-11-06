@@ -230,6 +230,10 @@ class BanqueExoShow {
             return this.isSearchMode ? this.searchResults : this.data;
         }
 		if (element.contextValue === 'folder') {
+			// In search mode, use pre-filtered children (chapters) if available
+			if (this.isSearchMode && element.children && element.children.length > 0) {
+				return element.children;
+			}
 			return generateChapterItems(element, this.collapsedState);
 		}
 		if (element.contextValue === 'chapter') {
@@ -307,18 +311,30 @@ class BanqueExoShow {
 
 	searchExercises(query) {
 		if (!query || query.trim() === '') {
-			return [];
+			return { results: [], metrics: {} };
 		}
 
-		const queryLower = query.toLowerCase();
+		const totalStart = performance.now();
+		const queryNormalizeStart = performance.now();
+		const queryLower = query.toLowerCase().trim();
+		const queryNormalizeTime = performance.now() - queryNormalizeStart;
+
 		const results = [];
+		const themeLoopStart = performance.now();
 
 		for (const theme of this.data) {
 			const matchingChapters = [];
 
 			const chapters = generateChapterItems(theme, this.collapsedState);
 			for (const chapter of chapters) {
-				const exercises = generateExerciseItems(chapter);
+				const chapterFilterStart = performance.now();
+				// Use cached exercises if available
+				const exerciseLines = BanqueExoShow.getExercises(chapter.filePath);
+				const basename = path.parse(chapter.filePath).name;
+				const exercises = exerciseLines.map(exoLine =>
+					buildExerciseItem(exoLine, chapter.filePath, chapter.theme, basename)
+				);
+
 				const matchingExercises = exercises.filter(exercise =>
 					exercise.label.toLowerCase().includes(queryLower)
 				);
@@ -355,7 +371,18 @@ class BanqueExoShow {
 			}
 		}
 
-		return results;
+		const totalTime = performance.now() - totalStart;
+		const themeLoopTime = performance.now() - themeLoopStart;
+
+		return {
+			results,
+			metrics: {
+				queryNormalizeTime,
+				themeLoopTime,
+				totalTime,
+				resultCount: results.length
+			}
+		};
 	}
 
 	setSearchResults(results, query) {
