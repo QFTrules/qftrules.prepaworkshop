@@ -351,7 +351,7 @@ function update_graphics_path() {
 
 // ACTIVATE FUNCTION //
 
-function activate() {
+function activate(context) {
 	console.log('The extension "prepa-workshop" is now active!');
 
 	// Create output channel for banque logs
