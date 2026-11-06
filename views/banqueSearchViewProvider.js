@@ -17,7 +17,6 @@ class BanqueSearchViewProvider {
 
 	setWebviewMessageListener(webview) {
 		webview.onDidReceiveMessage((message) => {
-			console.log('[BanqueSearch] Received message:', message.type);
 			if (message.type === 'search') {
 				vscode.commands.executeCommand('banque.search.fromWebview', message.query);
 			}
@@ -134,6 +133,34 @@ class BanqueSearchViewProvider {
 			pointer-events: none;
 		}
 
+		#clearTooltip::before {
+			content: '';
+			position: absolute;
+			top: -7px;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 0;
+			height: 0;
+			border-left: 7px solid transparent;
+			border-right: 7px solid transparent;
+			border-bottom: 7px solid var(--vscode-editorHoverWidget-border);
+			pointer-events: none;
+		}
+
+		#clearTooltip::after {
+			content: '';
+			position: absolute;
+			top: -6px;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 0;
+			height: 0;
+			border-left: 6px solid transparent;
+			border-right: 6px solid transparent;
+			border-bottom: 6px solid var(--vscode-editorHoverWidget-background);
+			pointer-events: none;
+		}
+
 		.no-results-message {
 			color: var(--vscode-descriptionForeground);
 			font-size: 13px;
@@ -161,71 +188,80 @@ class BanqueSearchViewProvider {
 
 	<script>
 		const vscode = acquireVsCodeApi();
-		const searchInput = document.getElementById('searchInput');
-		const clearBtn = document.getElementById('clearBtn');
-		let searchTimeout;
 
-		// Handle search input
-		searchInput.addEventListener('input', (e) => {
-			clearTimeout(searchTimeout);
-			searchTimeout = setTimeout(() => {
-				console.log('[SearchView] Input:', e.target.value);
-				vscode.postMessage({
-					type: 'search',
-					query: e.target.value
-				});
-			}, 300);
-		});
-
-		// Handle clear button
-		clearBtn.addEventListener('click', () => {
-			searchInput.value = '';
-			vscode.postMessage({
-				type: 'search',
-				query: ''
-			});
-		});
-
-		// Tooltip for clear button
-		const tooltip = document.getElementById('clearTooltip');
-		let tooltipTimeout;
-
-		clearBtn.addEventListener('mouseenter', () => {
-			tooltipTimeout = setTimeout(() => {
-				const rect = clearBtn.getBoundingClientRect();
-				tooltip.textContent = clearBtn.getAttribute('data-tooltip');
-				tooltip.style.left = (rect.left + rect.width / 2) + 'px';
-				tooltip.style.top = (rect.bottom + 8) + 'px';
-				tooltip.style.transform = 'translateX(-50%)';
-				tooltip.style.display = 'block';
-			}, 1000);
-		});
-
-		clearBtn.addEventListener('mouseleave', () => {
-			clearTimeout(tooltipTimeout);
-			tooltip.style.display = 'none';
-		});
-
-		// Handle messages from extension
-		window.addEventListener('message', event => {
-			const message = event.data;
-			const resultsDisplay = document.getElementById('noResultsMessage');
-
-			if (message.type === 'showNoResults') {
-				resultsDisplay.textContent = 'Aucun exercice trouvé';
-				resultsDisplay.style.display = 'block';
-			} else if (message.type === 'showResultsMessage') {
-				resultsDisplay.textContent = message.message;
-				resultsDisplay.style.display = 'block';
-			} else if (message.type === 'clearNoResults') {
-				resultsDisplay.style.display = 'none';
-			}
-		});
-
-		// Focus on search input
 		setTimeout(() => {
-			searchInput.focus();
-		}, 100);
+			const searchInput = document.getElementById('searchInput');
+			const clearBtn = document.getElementById('clearBtn');
+			let searchTimeout;
+
+			// Handle search input
+			if (searchInput) {
+				searchInput.addEventListener('input', (e) => {
+					clearTimeout(searchTimeout);
+					searchTimeout = setTimeout(() => {
+						vscode.postMessage({
+							type: 'search',
+							query: e.target.value
+						});
+					}, 300);
+				});
+			}
+
+			// Handle clear button
+			if (clearBtn) {
+				clearBtn.addEventListener('click', () => {
+					if (searchInput) searchInput.value = '';
+					vscode.postMessage({
+						type: 'search',
+						query: ''
+					});
+				});
+			}
+
+			// Tooltip for clear button
+			const tooltip = document.getElementById('clearTooltip');
+			let tooltipTimeout;
+
+			if (clearBtn && tooltip) {
+				clearBtn.addEventListener('mouseenter', () => {
+					tooltipTimeout = setTimeout(() => {
+						const rect = clearBtn.getBoundingClientRect();
+						tooltip.textContent = clearBtn.getAttribute('data-tooltip');
+						tooltip.style.display = 'block';
+						const tooltipWidth = tooltip.offsetWidth;
+						const iconCenterX = rect.left + rect.width / 2;
+						tooltip.style.left = (iconCenterX - tooltipWidth / 2) + 'px';
+						tooltip.style.top = (rect.bottom + 8) + 'px';
+						tooltip.style.transform = 'none';
+					}, 300);
+				});
+
+				clearBtn.addEventListener('mouseleave', () => {
+					clearTimeout(tooltipTimeout);
+					tooltip.style.display = 'none';
+				});
+			}
+
+			// Handle messages from extension
+			window.addEventListener('message', event => {
+				const message = event.data;
+				const resultsDisplay = document.getElementById('noResultsMessage');
+
+				if (message.type === 'showNoResults') {
+					resultsDisplay.textContent = 'Aucun exercice trouvé';
+					resultsDisplay.style.display = 'block';
+				} else if (message.type === 'showResultsMessage') {
+					resultsDisplay.textContent = message.message;
+					resultsDisplay.style.display = 'block';
+				} else if (message.type === 'clearNoResults') {
+					resultsDisplay.style.display = 'none';
+				}
+			});
+
+			if (searchInput) {
+				searchInput.focus();
+			}
+		}, 50);
 	</script>
 </body>
 </html>`;

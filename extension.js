@@ -361,10 +361,18 @@ function activate(context) {
 	runtimeExerciceStyPath = update_graphics_path();
 	const banqueProvider = new BanqueExoShow();
 	const banqueTreeView = vscode.window.createTreeView('banque-exercices', { treeDataProvider: banqueProvider });
-	const banqueSearchViewProvider = new BanqueSearchViewProvider(banqueProvider);
-	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider('banque-search', banqueSearchViewProvider)
-	);
+
+	// Register search WebView - declare at module scope so command handlers can access it
+	let banqueSearchViewProvider;
+	try {
+		banqueSearchViewProvider = new BanqueSearchViewProvider(banqueProvider);
+		context.subscriptions.push(
+			vscode.window.registerWebviewViewProvider('banque-search', banqueSearchViewProvider)
+		);
+	} catch (error) {
+		console.error('Failed to register search WebView:', error);
+	}
+
 	const expandedNodes = new Map();
 
 	function nodeKey(element) {
@@ -548,6 +556,27 @@ function activate(context) {
 		}
 	});
 
+	// Helper function to count search results
+	function countSearchResults(results) {
+		let exercises = 0;
+		let chapters = 0;
+		let themes = 0;
+
+		results.forEach(theme => {
+			themes++;
+			if (theme.children) {
+				theme.children.forEach(chapter => {
+					chapters++;
+					if (chapter.children) {
+						exercises += chapter.children.length;
+					}
+				});
+			}
+		});
+
+		return { exercises, chapters, themes };
+	}
+
 	// Search handler from WebView
 	vscode.commands.registerCommand('banque.search.fromWebview', async function (query) {
 		console.log('[SEARCH] WebView search for:', query);
@@ -569,12 +598,13 @@ function activate(context) {
 					vscode.commands.executeCommand('list.collapseAll');
 				}, 100);
 			} else {
-				// Found results
-				banqueProvider.searchResults = results;
-				banqueProvider.isSearchMode = true;
-				banqueSearchViewProvider.showResultsMessage(
-					`${results.reduce((sum, t) => sum + (t.children ? t.children.reduce((s, c) => s + (c.children ? c.children.length : 0), 0) : 0), 0)} exercices trouvés`
-				);
+				// Found results - use proper method to update state
+				const counts = countSearchResults(results);
+				const msg = `${counts.exercises} exercices trouvés dans ${counts.chapters} chapitres et ${counts.themes} thèmes`;
+
+				banqueProvider.setSearchResults(results, query);
+				banqueSearchViewProvider.showResultsMessage(msg);
+				BanqueExoShow.log(`[SEARCH] Found ${counts.exercises} result(s) for: "${query}"`);
 				banqueProvider.refresh();
 				// Auto-expand results
 				if (results && results.length > 0) {
@@ -606,6 +636,7 @@ function activate(context) {
 		banqueProvider.isSearchMode = false;
 		banqueProvider.searchResults = [];
 		banqueProvider.refresh();
+		banqueSearchViewProvider.clearNoResults();
 		BanqueExoShow.log('[SEARCH] Search cleared');
 	});
 

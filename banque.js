@@ -233,6 +233,11 @@ class BanqueExoShow {
 			return generateChapterItems(element, this.collapsedState);
 		}
 		if (element.contextValue === 'chapter') {
+			// In search mode, use pre-filtered children if available
+			if (this.isSearchMode && element.children && element.children.length > 0) {
+				return element.children;
+			}
+			// Otherwise, generate exercises normally
 			const exercises = generateExerciseItems(element);
 			return BanqueExoShow.sortItems(exercises, BanqueExoShow.sortMode);
 		}
@@ -356,6 +361,7 @@ class BanqueExoShow {
 	setSearchResults(results, query) {
 		this.searchResults = results;
 		this.isSearchMode = true;
+		this._onDidChangeTreeData.fire(undefined);
 	}
 
 	clearSearchResults() {
